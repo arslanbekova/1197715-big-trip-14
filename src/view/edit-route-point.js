@@ -1,4 +1,4 @@
-export const createEditPointTemplate = () => {
+export const createEditRoutePointTemplate = () => {
   return `<form class="event event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
