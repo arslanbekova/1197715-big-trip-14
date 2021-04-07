@@ -30,3 +30,7 @@ const generateDate = (date = undefined) => {
 };
 
 export {getRandomElement, shuffle, getRandomInt, generateDate};
+
+export const toUpperCaseFirstSymbol = (str) => {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
