@@ -25,3 +25,8 @@ export const MaxCount = {
   DESTINATION_DESCRIPTION_SENTENCES: 5,
   DESTINATION_PICTURES: 5,
 };
+
+export const Price = {
+  MIN_PRICE: 15,
+  MAX_PRICE: 150,
+};
