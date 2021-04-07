@@ -9,7 +9,7 @@ import {createSortOptionsTemplate} from './view/sort-options';
 import {generateRoutePoint} from './mock/route-point';
 
 const EVENTS_COUNT = 20;
-const routPoints = Array(EVENTS_COUNT).fill('route point').map(generateRoutePoint);
+const routePoints = Array(EVENTS_COUNT).fill('route point').map(generateRoutePoint);
 
 const render = (container, template, place = 'beforeend') => {
   container.insertAdjacentHTML(place, template);
@@ -42,12 +42,14 @@ render(mainTripEventsElement, createSortOptionsTemplate());
 const mainTripEventsList = document.createElement('ul');
 mainTripEventsList.classList.add('trip-events__list');
 
-routPoints.forEach((routPoint) => {
-  render(mainTripEventsList, createRoutePointTemplate(routPoint));
+const [firstoRoutePoint, ...otherRoutePoints] = routePoints;
+
+otherRoutePoints.forEach((routePoint) => {
+  render(mainTripEventsList, createRoutePointTemplate(routePoint));
 });
 
 mainTripEventsElement.appendChild(mainTripEventsList);
 
 // Добавляет формы редактирования и создания
-render(mainTripEventsList, createEditRoutePointTemplate(), 'afterbegin');
+render(mainTripEventsList, createEditRoutePointTemplate(firstoRoutePoint), 'afterbegin');
 render(mainTripEventsList, createNewRoutePointTemplate());
