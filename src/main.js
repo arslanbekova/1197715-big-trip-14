@@ -49,13 +49,23 @@ const renderRoutePoint = (eventListElement, routePoint) => {
     eventListElement.replaceChild(RoutePointComponent.getElement(), EditRoutePointComponent.getElement());
   };
 
+  const onEscKeyDown = (evt) => {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      closeEditRoutePointForm();
+      document.removeEventListener('keydown', onEscKeyDown);
+    }
+  };
+
   RoutePointComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
     openEditRoutePointForm();
+    document.addEventListener('keydown', onEscKeyDown);
   });
 
   EditRoutePointComponent.getElement().addEventListener('submit', (evt) => {
     evt.preventDefault();
     closeEditRoutePointForm();
+    document.removeEventListener('keydown', onEscKeyDown);
   });
 
   renderElement(eventListElement, RoutePointComponent.getElement());
