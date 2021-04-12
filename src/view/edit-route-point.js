@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import {restructuredDestinations} from '../mock/destinations';
 import {ROUTE_POINT_TYPES} from '../utils/const';
-import {toUpperCaseFirstSymbol} from '../utils/general';
+import {toUpperCaseFirstSymbol, createElement} from '../utils/general';
 
 const createOfferTemplate = (offers, offerType) => {
   return offers.map((offer, index) =>
@@ -31,7 +31,7 @@ const createEventDestinationTemplate = (destinations) => {
   ).join('');
 };
 
-export const createEditRoutePointTemplate = (routePoint) => {
+const createEditRoutePointTemplate = (routePoint) => {
   const {dateFrom, dateTo, type, destination, basePrice, offers} = routePoint;
   const offersTemplate = createOfferTemplate(offers, type);
   const eventTypesTemplate = createEventTypeTemplate(ROUTE_POINT_TYPES);
@@ -101,3 +101,26 @@ export const createEditRoutePointTemplate = (routePoint) => {
     </section>
   </form>`;
 };
+
+export default class EditRoutePoint {
+  constructor(routePoint) {
+    this._routePoint = routePoint;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createEditRoutePointTemplate(this._routePoint);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

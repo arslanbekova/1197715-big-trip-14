@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import {createElement} from '../utils/general';
 
 const calculateDurationTime = (startTime, endTime) => {
   dayjs.extend(duration);
@@ -37,7 +38,7 @@ const createOfferTemplate = (offers) => {
   ).join('');
 };
 
-export const createRoutePointTemplate = (routePoint) => {
+const createRoutePointTemplate = (routePoint) => {
   const {dateFrom, dateTo, type, destination, basePrice, offers, isFavorite} = routePoint;
 
   const offersTemplate = createOfferTemplate(offers);
@@ -79,3 +80,26 @@ export const createRoutePointTemplate = (routePoint) => {
     </div>
   </li>`;
 };
+
+export default class RoutePoint {
+  constructor(routePoint) {
+    this._routePoint = routePoint;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createRoutePointTemplate(this._routePoint);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
