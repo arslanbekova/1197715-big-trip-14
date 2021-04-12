@@ -37,17 +37,38 @@ const mainTripEventsElement = siteMainElement.querySelector('.trip-events');
 renderElement(mainTripEventsElement, new SortOptions().getElement());
 
 // Добавляет список событий и события
+const renderRoutePoint = (eventListElement, routePoint) => {
+  const RoutePointComponent = new RoutePoint(routePoint);
+  const EditRoutePointComponent = new EditRoutePoint(routePoint);
+
+  const openEditRoutePointForm = () => {
+    eventListElement.replaceChild(EditRoutePointComponent.getElement(), RoutePointComponent.getElement());
+  };
+
+  const closeEditRoutePointForm = () => {
+    eventListElement.replaceChild(RoutePointComponent.getElement(), EditRoutePointComponent.getElement());
+  };
+
+  RoutePointComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
+    openEditRoutePointForm();
+  });
+
+  EditRoutePointComponent.getElement().addEventListener('submit', (evt) => {
+    evt.preventDefault();
+    closeEditRoutePointForm();
+  });
+
+  renderElement(eventListElement, RoutePointComponent.getElement());
+};
+
 const mainTripEventsList = document.createElement('ul');
 mainTripEventsList.classList.add('trip-events__list');
 
-const [firstRoutePoint, ...otherRoutePoints] = routePoints;
-
-otherRoutePoints.forEach((routePoint) => {
-  renderElement(mainTripEventsList, new RoutePoint(routePoint).getElement());
+routePoints.forEach((routePoint) => {
+  renderRoutePoint(mainTripEventsList, routePoint);
 });
 
 mainTripEventsElement.appendChild(mainTripEventsList);
 
-// Добавляет формы редактирования и создания
-renderElement(mainTripEventsList, new EditRoutePoint(firstRoutePoint).getElement(), RenderPosition.AFTERBEGIN);
+// Добавляет форму создания
 renderElement(mainTripEventsList, new NewRoutePoint().getElement());
