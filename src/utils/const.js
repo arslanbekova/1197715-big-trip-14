@@ -30,3 +30,8 @@ export const Price = {
   MIN_PRICE: 15,
   MAX_PRICE: 150,
 };
+
+export const RenderPosition = {
+  AFTERBEGIN: 'afterbegin',
+  BEFOREEND: 'beforeend',
+};
