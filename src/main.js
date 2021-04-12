@@ -68,6 +68,10 @@ const renderRoutePoint = (eventListElement, routePoint) => {
     document.removeEventListener('keydown', onEscKeyDown);
   });
 
+  EditRoutePointComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
+    closeEditRoutePointForm();
+  });
+
   renderElement(eventListElement, RoutePointComponent.getElement());
 };
 
