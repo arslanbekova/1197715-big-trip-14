@@ -49,18 +49,17 @@ const renderRoutePoint = (eventListElement, routePoint) => {
     }
   };
 
-  RoutePointComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
+  RoutePointComponent.setArrowClickHandler(() => {
     openEditRoutePointForm();
     document.addEventListener('keydown', onEscKeyDown);
   });
 
-  EditRoutePointComponent.getElement().addEventListener('submit', (evt) => {
-    evt.preventDefault();
+  EditRoutePointComponent.setFormSubmitHandler(() => {
     closeEditRoutePointForm();
     document.removeEventListener('keydown', onEscKeyDown);
   });
 
-  EditRoutePointComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
+  EditRoutePointComponent.setArrowClickHandler(() => {
     closeEditRoutePointForm();
   });
 

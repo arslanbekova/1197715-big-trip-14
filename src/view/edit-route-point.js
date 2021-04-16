@@ -107,9 +107,32 @@ export default class EditRoutePoint extends Abstract {
   constructor(routePoint) {
     super();
     this._routePoint = routePoint;
+
+    this._arrowClickHandler = this._arrowClickHandler.bind(this);
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
   }
 
   getTemplate() {
     return createEditRoutePointTemplate(this._routePoint);
+  }
+
+  _arrowClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.arrowClick();
+  }
+
+  setArrowClickHandler(callback) {
+    this._callback.arrowClick = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._arrowClickHandler);
+  }
+
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().addEventListener('submit', this._formSubmitHandler);
   }
 }
