@@ -1,6 +1,7 @@
 import {restructuredDestinations} from '../mock/destinations';
 import {ROUTE_POINT_TYPES} from '../utils/const';
-import {toUpperCaseFirstSymbol, createElement} from '../utils/general';
+import {toUpperCaseFirstSymbol} from '../utils/general';
+import Abstract from './abstract';
 
 const createEventTypeTemplate = (eventTypes) => {
   return eventTypes.map((eventType) =>
@@ -91,24 +92,9 @@ export const createNewRoutePointTemplate = () => {
   </form>`;
 };
 
-export default class NewRoutePoint {
-  constructor() {
-    this._element = null;
-  }
+export default class NewRoutePoint extends Abstract {
 
   getTemplate() {
     return createNewRoutePointTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

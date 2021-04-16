@@ -8,7 +8,7 @@ import SiteMenu from './view/site-menu';
 import FilterOptions from './view/filter-options';
 import SortOptions from './view/sort-options';
 import {generateRoutePoint} from './mock/route-point';
-import {renderElement} from './utils/general';
+import {render, replace} from './utils/render';
 import {RenderPosition} from './utils/const';
 
 const EVENTS_COUNT = 20;
@@ -20,10 +20,10 @@ const headerTripContainer = siteHeaderElement.querySelector('.trip-main');
 // Добавляет меню и фильтры
 const headerControlsContainer = headerTripContainer.querySelector('.trip-controls');
 const headerNavigationContainer = headerControlsContainer.querySelector('.trip-controls__navigation');
-renderElement(headerNavigationContainer, new SiteMenu().getElement());
+render(headerNavigationContainer, new SiteMenu());
 
 const headerFilterOptionsContainer = headerControlsContainer.querySelector('.trip-controls__filters');
-renderElement(headerFilterOptionsContainer, new FilterOptions().getElement());
+render(headerFilterOptionsContainer, new FilterOptions());
 
 // Добавляет сортировку
 const siteMainElement = document.querySelector('.page-main');
@@ -34,11 +34,11 @@ const renderRoutePoint = (eventListElement, routePoint) => {
   const EditRoutePointComponent = new EditRoutePoint(routePoint);
 
   const openEditRoutePointForm = () => {
-    eventListElement.replaceChild(EditRoutePointComponent.getElement(), RoutePointComponent.getElement());
+    replace(EditRoutePointComponent, RoutePointComponent);
   };
 
   const closeEditRoutePointForm = () => {
-    eventListElement.replaceChild(RoutePointComponent.getElement(), EditRoutePointComponent.getElement());
+    replace(RoutePointComponent, EditRoutePointComponent);
   };
 
   const onEscKeyDown = (evt) => {
@@ -49,34 +49,33 @@ const renderRoutePoint = (eventListElement, routePoint) => {
     }
   };
 
-  RoutePointComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
+  RoutePointComponent.setArrowClickHandler(() => {
     openEditRoutePointForm();
     document.addEventListener('keydown', onEscKeyDown);
   });
 
-  EditRoutePointComponent.getElement().addEventListener('submit', (evt) => {
-    evt.preventDefault();
+  EditRoutePointComponent.setFormSubmitHandler(() => {
     closeEditRoutePointForm();
     document.removeEventListener('keydown', onEscKeyDown);
   });
 
-  EditRoutePointComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
+  EditRoutePointComponent.setArrowClickHandler(() => {
     closeEditRoutePointForm();
   });
 
-  renderElement(eventListElement, RoutePointComponent.getElement());
+  render(eventListElement, RoutePointComponent);
 };
 
 if (!routePoints.length) {
-  renderElement(mainTripEventsElement, new NoRoutePoints().getElement());
+  render(mainTripEventsElement, new NoRoutePoints());
 } else {
   // Добавляет информацию о маршруте: города, даты, стоимость
-  renderElement(headerTripContainer, new TripInfo().getElement(), RenderPosition.AFTERBEGIN);
+  render(headerTripContainer, new TripInfo(), RenderPosition.AFTERBEGIN);
   const headerTripInfoElement = headerTripContainer.querySelector('.trip-info');
-  renderElement(headerTripInfoElement, new CostInfo().getElement());
+  render(headerTripInfoElement, new CostInfo());
 
   // Добавляет сортировку
-  renderElement(mainTripEventsElement, new SortOptions().getElement());
+  render(mainTripEventsElement, new SortOptions());
 
   // Добавляет список событий и события
   const mainTripEventsList = document.createElement('ul');
@@ -89,5 +88,5 @@ if (!routePoints.length) {
   mainTripEventsElement.appendChild(mainTripEventsList);
 
   // Добавляет форму создания
-  renderElement(mainTripEventsList, new NewRoutePoint().getElement());
+  render(mainTripEventsList, new NewRoutePoint());
 }
