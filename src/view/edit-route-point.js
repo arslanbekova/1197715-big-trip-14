@@ -1,7 +1,8 @@
 import dayjs from 'dayjs';
 import {restructuredDestinations} from '../mock/destinations';
 import {ROUTE_POINT_TYPES} from '../utils/const';
-import {toUpperCaseFirstSymbol, createElement} from '../utils/general';
+import {toUpperCaseFirstSymbol} from '../utils/general';
+import Abstract from './abstract';
 
 const createOfferTemplate = (offers, offerType) => {
   return offers.map((offer, index) =>
@@ -102,25 +103,13 @@ const createEditRoutePointTemplate = (routePoint) => {
   </form>`;
 };
 
-export default class EditRoutePoint {
+export default class EditRoutePoint extends Abstract {
   constructor(routePoint) {
+    super();
     this._routePoint = routePoint;
-    this._element = null;
   }
 
   getTemplate() {
     return createEditRoutePointTemplate(this._routePoint);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
