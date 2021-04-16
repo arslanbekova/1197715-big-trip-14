@@ -1,8 +1,20 @@
 import {nanoid} from 'nanoid';
-import {getRandomElement, getRandomInt, generateDate} from '../utils/general';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+import {getRandomElement, getRandomInt} from '../utils/general';
 import {ROUTE_POINT_TYPES, MaxCount, Price} from '../utils/const';
 import {generateDestinations} from './destinations';
 import {restructuredOffers} from './offers';
+
+const generateDate = (date = undefined) => {
+  dayjs.extend(duration);
+  const gap = 7;
+  const daysGap = getRandomInt(gap);
+  const hoursGap = getRandomInt(gap);
+  const minutesGap = getRandomInt(gap);
+
+  return dayjs(date).add(dayjs.duration({days: daysGap, hours: hoursGap, minutes: minutesGap})).toDate().toISOString();
+};
 
 export const generateRoutePoint = () => {
   const dateFrom = generateDate();
