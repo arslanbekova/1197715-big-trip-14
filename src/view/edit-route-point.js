@@ -1,7 +1,8 @@
 import dayjs from 'dayjs';
 import {restructuredDestinations} from '../mock/destinations';
 import {ROUTE_POINT_TYPES} from '../utils/const';
-import {toUpperCaseFirstSymbol, createElement} from '../utils/general';
+import {toUpperCaseFirstSymbol} from '../utils/general';
+import Abstract from './abstract';
 
 const createOfferTemplate = (offers, offerType) => {
   return offers.map((offer, index) =>
@@ -102,25 +103,36 @@ const createEditRoutePointTemplate = (routePoint) => {
   </form>`;
 };
 
-export default class EditRoutePoint {
+export default class EditRoutePoint extends Abstract {
   constructor(routePoint) {
+    super();
     this._routePoint = routePoint;
-    this._element = null;
+
+    this._arrowClickHandler = this._arrowClickHandler.bind(this);
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
   }
 
   getTemplate() {
     return createEditRoutePointTemplate(this._routePoint);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _arrowClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.arrowClick();
   }
 
-  removeElement() {
-    this._element = null;
+  setArrowClickHandler(callback) {
+    this._callback.arrowClick = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._arrowClickHandler);
+  }
+
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().addEventListener('submit', this._formSubmitHandler);
   }
 }

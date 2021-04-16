@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import {createElement} from '../utils/general';
+import Abstract from './abstract';
 
 const calculateDurationTime = (startTime, endTime) => {
   dayjs.extend(duration);
@@ -81,25 +81,25 @@ const createRoutePointTemplate = (routePoint) => {
   </li>`;
 };
 
-export default class RoutePoint {
+export default class RoutePoint extends Abstract {
   constructor(routePoint) {
+    super();
     this._routePoint = routePoint;
-    this._element = null;
+
+    this._arrowClickHandler = this._arrowClickHandler.bind(this);
   }
 
   getTemplate() {
     return createRoutePointTemplate(this._routePoint);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _arrowClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.arrowClick();
   }
 
-  removeElement() {
-    this._element = null;
+  setArrowClickHandler(callback) {
+    this._callback.arrowClick = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._arrowClickHandler);
   }
 }
