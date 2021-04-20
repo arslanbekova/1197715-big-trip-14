@@ -1,5 +1,5 @@
 // import NewRoutePoint from './view/new-route-point';
-import Trip from './presenter/trip';
+import TripPresenter from './presenter/trip-presenter';
 import SiteMenu from './view/site-menu';
 import FilterOptions from './view/filter-options';
 import {generateRoutePoint} from './mock/route-point';
@@ -22,7 +22,7 @@ render(filterOptionsContainer, new FilterOptions());
 const siteMainElement = document.querySelector('.page-main');
 const tripEventsContainer = siteMainElement.querySelector('.trip-events');
 
-const tripPresenter = new Trip(tripEventsContainer, tripInfoContainer);
+const tripPresenter = new TripPresenter(tripEventsContainer, tripInfoContainer);
 tripPresenter.init(routePoints);
 
 // Добавляет форму создания

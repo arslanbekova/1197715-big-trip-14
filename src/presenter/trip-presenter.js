@@ -2,9 +2,8 @@ import NoRoutePoints from '../view/no-route-points';
 import CostInfo from '../view/cost-info';
 import TripInfo from '../view/trip-info';
 import SortOptions from '../view/sort-options';
-import RoutePoint from '../view/route-point';
-import EditRoutePoint from '../view/edit-route-point';
-import {render, replace} from '../utils/render';
+import RoutePointPresenter from './route-point-presenter';
+import {render} from '../utils/render';
 import {RenderPosition} from '../utils/const';
 
 export default class Trip {
@@ -37,40 +36,8 @@ export default class Trip {
   }
 
   _renderRoutePoint(routePoint, eventsList) {
-    const RoutePointComponent = new RoutePoint(routePoint);
-    const EditRoutePointComponent = new EditRoutePoint(routePoint);
-
-    const openEditRoutePointForm = () => {
-      replace(EditRoutePointComponent, RoutePointComponent);
-    };
-
-    const closeEditRoutePointForm = () => {
-      replace(RoutePointComponent, EditRoutePointComponent);
-    };
-
-    const onEscKeyDown = (evt) => {
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
-        evt.preventDefault();
-        closeEditRoutePointForm();
-        document.removeEventListener('keydown', onEscKeyDown);
-      }
-    };
-
-    RoutePointComponent.setArrowClickHandler(() => {
-      openEditRoutePointForm();
-      document.addEventListener('keydown', onEscKeyDown);
-    });
-
-    EditRoutePointComponent.setFormSubmitHandler(() => {
-      closeEditRoutePointForm();
-      document.removeEventListener('keydown', onEscKeyDown);
-    });
-
-    EditRoutePointComponent.setArrowClickHandler(() => {
-      closeEditRoutePointForm();
-    });
-
-    render(eventsList, RoutePointComponent);
+    const routePointPresenter = new RoutePointPresenter(eventsList);
+    routePointPresenter.init(routePoint);
   }
 
   _renderRoutePoints() {
