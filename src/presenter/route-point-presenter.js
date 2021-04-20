@@ -2,13 +2,20 @@ import RoutePoint from '../view/route-point';
 import EditRoutePoint from '../view/edit-route-point';
 import {render, replace, remove} from '../utils/render';
 
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+};
+
 export default class RoutePointPresenter {
-  constructor(eventsList, addToFavorites) {
+  constructor(eventsList, addToFavorites, changeMode) {
     this._eventsList = eventsList;
     this._addToFavorites = addToFavorites;
+    this._changeMode = changeMode;
 
     this._routePointComponent = null;
     this._editRoutePointComponent = null;
+    this._mode = Mode.DEFAULT;
 
     this._handleRoutePointArrowClick = this._handleRoutePointArrowClick.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
@@ -36,11 +43,11 @@ export default class RoutePointPresenter {
       return;
     }
 
-    if (this._eventsList.contains(prevRoutePointComponent.getElement())) {
+    if (this._mode === Mode.DEFAULT) {
       replace(this._routePointComponent, prevRoutePointComponent);
     }
 
-    if (this._eventsList.contains(prevEditRoutePointComponent.getElement())) {
+    if (this._mode === Mode.EDITING) {
       replace(this._editRoutePointComponent, prevEditRoutePointComponent);
     }
 
@@ -48,14 +55,23 @@ export default class RoutePointPresenter {
     remove(prevEditRoutePointComponent);
   }
 
+  resetView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._closeEditRoutePointForm();
+    }
+  }
+
   _openEditRoutePointForm() {
     replace(this._editRoutePointComponent, this._routePointComponent);
     document.addEventListener('keydown', this._escKeyDownHandler);
+    this._changeMode();
+    this._mode = Mode.EDITING;
   }
 
   _closeEditRoutePointForm() {
     replace(this._routePointComponent, this._editRoutePointComponent);
     document.removeEventListener('keydown', this._escKeyDownHandler);
+    this._mode = Mode.DEFAULT;
   }
 
   _escKeyDownHandler(evt) {

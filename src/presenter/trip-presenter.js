@@ -19,11 +19,18 @@ export default class Trip {
     this._noRoutePointsComponent = new NoRoutePoints();
 
     this._handleAddToFavorites = this._handleAddToFavorites.bind(this);
+    this._handleModeChange = this._handleModeChange.bind(this);
   }
 
   init(routePoints) {
     this._routePoints = routePoints.slice();
     this._renderTrip();
+  }
+
+  _handleModeChange() {
+    Object
+      .values(this._routePointPresenter)
+      .forEach((presenter) => presenter.resetView());
   }
 
   _handleAddToFavorites(updatedRoutePoint) {
@@ -45,7 +52,7 @@ export default class Trip {
   }
 
   _renderRoutePoint(routePoint, eventsList) {
-    const routePointPresenter = new RoutePointPresenter(eventsList, this._handleAddToFavorites);
+    const routePointPresenter = new RoutePointPresenter(eventsList, this._handleAddToFavorites, this._handleModeChange);
     routePointPresenter.init(routePoint);
     this._routePointPresenter[routePoint.id] = routePointPresenter;
   }
