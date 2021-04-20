@@ -28,8 +28,8 @@ export default class Trip {
   }
 
   _renderCostInfo() {
-    const headerTripInfoElement = this._tripInfoContainer.querySelector('.trip-info');
-    render(headerTripInfoElement, this._costInfoComponent);
+    const tripInfoElement = this._tripInfoComponent.getElement();
+    render(tripInfoElement, this._costInfoComponent);
   }
 
   _renderSort() {

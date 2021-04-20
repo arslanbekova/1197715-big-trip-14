@@ -9,23 +9,22 @@ const EVENTS_COUNT = 20;
 const routePoints = Array(EVENTS_COUNT).fill('route point').map(generateRoutePoint);
 
 const siteHeaderElement = document.querySelector('.page-header');
-const headerTripContainer = siteHeaderElement.querySelector('.trip-main');
+const tripInfoContainer = siteHeaderElement.querySelector('.trip-main');
 
 // Добавляет меню и фильтры
-const headerControlsContainer = headerTripContainer.querySelector('.trip-controls');
-const headerNavigationContainer = headerControlsContainer.querySelector('.trip-controls__navigation');
-render(headerNavigationContainer, new SiteMenu());
+const navigationContainer = tripInfoContainer.querySelector('.trip-controls__navigation');
+render(navigationContainer, new SiteMenu());
 
-const headerFilterOptionsContainer = headerControlsContainer.querySelector('.trip-controls__filters');
-render(headerFilterOptionsContainer, new FilterOptions());
+const filterOptionsContainer = tripInfoContainer.querySelector('.trip-controls__filters');
+render(filterOptionsContainer, new FilterOptions());
 
+// Добавляет точки маршрута
 const siteMainElement = document.querySelector('.page-main');
-const mainTripEventsElement = siteMainElement.querySelector('.trip-events');
+const tripEventsContainer = siteMainElement.querySelector('.trip-events');
 
-const tripPresenter = new Trip(mainTripEventsElement, headerTripContainer);
+const tripPresenter = new Trip(tripEventsContainer, tripInfoContainer);
 tripPresenter.init(routePoints);
 
-
-//   // Добавляет форму создания
-//   render(mainTripEventsList, new NewRoutePoint());
+// Добавляет форму создания
+//render(mainTripEventsList, new NewRoutePoint());
 
