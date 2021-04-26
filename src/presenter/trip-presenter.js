@@ -11,6 +11,10 @@ export default class Trip {
   constructor(tripEventsContainer, tripInfoContainer) {
     this._tripEventsContainer = tripEventsContainer;
     this._tripInfoContainer = tripInfoContainer;
+    this._tripEventsList = document.createElement('ul');
+    this._tripEventsList.classList.add('trip-events__list');
+    this._tripEventsContainer.appendChild(this._tripEventsList);
+
     this._routePointPresenter = {};
 
     this._tripInfoComponent = new TripInfo();
@@ -34,7 +38,7 @@ export default class Trip {
   }
 
   _handleAddToFavorites(updatedRoutePoint) {
-    this.routePoints = updateItem(this._routePoints, updatedRoutePoint);
+    this._routePoints = updateItem(this._routePoints, updatedRoutePoint);
     this._routePointPresenter[updatedRoutePoint.id].init(updatedRoutePoint);
   }
 
@@ -48,7 +52,7 @@ export default class Trip {
   }
 
   _renderSort() {
-    render(this._tripEventsContainer, this._sortComponent);
+    render(this._tripEventsContainer, this._sortComponent, RenderPosition.AFTERBEGIN);
   }
 
   _renderRoutePoint(routePoint, eventsList) {
@@ -58,13 +62,9 @@ export default class Trip {
   }
 
   _renderRoutePoints() {
-    const tripEventsList = document.createElement('ul');
-    tripEventsList.classList.add('trip-events__list');
-
     this._routePoints.forEach((routePoint) => {
-      this._renderRoutePoint(routePoint, tripEventsList);
+      this._renderRoutePoint(routePoint, this._tripEventsList);
     });
-    this._tripEventsContainer.appendChild(tripEventsList);
   }
 
   _renderNoRoutePoints() {
