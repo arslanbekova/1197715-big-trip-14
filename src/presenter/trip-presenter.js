@@ -4,8 +4,8 @@ import TripInfo from '../view/trip-info';
 import SortOptions from '../view/sort-options';
 import RoutePointPresenter from './route-point-presenter';
 import {render} from '../utils/render';
-import {updateItem, SortOption} from '../utils/general';
-import {RenderPosition} from '../utils/const';
+import {updateItem} from '../utils/general';
+import {RenderPosition, SortOption} from '../utils/const';
 import dayjs from 'dayjs';
 
 export default class Trip {
@@ -35,6 +35,13 @@ export default class Trip {
     this._renderTrip();
   }
 
+  _clearRoutePoints() {
+    Object
+      .values(this._routePointPresenter)
+      .forEach((presenter) => presenter.destroy());
+    this._routePointPresenter = {};
+  }
+
   _sortRoutePoints(sortType) {
     switch (sortType) {
       case SortOption.TO_SHORTEST_TIME.value:
@@ -58,6 +65,8 @@ export default class Trip {
       return;
     }
     this._sortRoutePoints(sortType);
+    this._clearRoutePoints();
+    this._renderRoutePoints();
   }
 
   _handleModeChange() {
