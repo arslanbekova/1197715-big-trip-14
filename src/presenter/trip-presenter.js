@@ -4,8 +4,9 @@ import TripInfo from '../view/trip-info';
 import SortOptions from '../view/sort-options';
 import RoutePointPresenter from './route-point-presenter';
 import {render} from '../utils/render';
-import {updateItem} from '../utils/general';
+import {updateItem, SortOption} from '../utils/general';
 import {RenderPosition} from '../utils/const';
+import dayjs from 'dayjs';
 
 export default class Trip {
   constructor(tripEventsContainer, tripInfoContainer) {
@@ -16,6 +17,7 @@ export default class Trip {
     this._tripEventsContainer.appendChild(this._tripEventsList);
 
     this._routePointPresenter = {};
+    this._currentSortType = SortOption.DEFAULT;
 
     this._tripInfoComponent = new TripInfo();
     this._costInfoComponent = new CostInfo();
@@ -24,11 +26,38 @@ export default class Trip {
 
     this._handleAddToFavorites = this._handleAddToFavorites.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
   init(routePoints) {
     this._routePoints = routePoints.slice();
+    this._sourcedRoutePoints = routePoints.slice();
     this._renderTrip();
+  }
+
+  _sortRoutePoints(sortType) {
+    switch (sortType) {
+      case SortOption.TO_SHORTEST_TIME.value:
+        this._routePoints.sort((a, b) => {
+          const aDuration = dayjs.duration(dayjs(a.dateTo).diff(dayjs(a.dateFrom))).asMilliseconds();
+          const bDuration = dayjs.duration(dayjs(b.dateTo).diff(dayjs(b.dateFrom))).asMilliseconds();
+          return aDuration - bDuration;
+        });
+        break;
+      case SortOption.TO_LOWEST_PRICE.value:
+        this._routePoints.sort((a, b) => a.basePrice - b.basePrice );
+        break;
+      default:
+        this._routePoints = this._sourcedRoutePoints.slice();
+    }
+    this._currentSortType = sortType;
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+    this._sortRoutePoints(sortType);
   }
 
   _handleModeChange() {
@@ -39,6 +68,7 @@ export default class Trip {
 
   _handleAddToFavorites(updatedRoutePoint) {
     this._routePoints = updateItem(this._routePoints, updatedRoutePoint);
+    this._sourcedRoutePoints = updateItem(this._routePoints, updatedRoutePoint);
     this._routePointPresenter[updatedRoutePoint.id].init(updatedRoutePoint);
   }
 
@@ -53,6 +83,7 @@ export default class Trip {
 
   _renderSort() {
     render(this._tripEventsContainer, this._sortComponent, RenderPosition.AFTERBEGIN);
+    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _renderRoutePoint(routePoint, eventsList) {
