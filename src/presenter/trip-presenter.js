@@ -17,7 +17,7 @@ export default class Trip {
     this._tripEventsContainer.appendChild(this._tripEventsList);
 
     this._routePointPresenter = {};
-    this._currentSortType = SortOption.DEFAULT;
+    this._currentSortType = SortOption.DEFAULT.value;
 
     this._tripInfoComponent = new TripInfo();
     this._costInfoComponent = new CostInfo();
@@ -77,7 +77,7 @@ export default class Trip {
 
   _handleAddToFavorites(updatedRoutePoint) {
     this._routePoints = updateItem(this._routePoints, updatedRoutePoint);
-    this._sourcedRoutePoints = updateItem(this._routePoints, updatedRoutePoint);
+    this._sourcedRoutePoints = updateItem(this._sourcedRoutePoints, updatedRoutePoint);
     this._routePointPresenter[updatedRoutePoint.id].init(updatedRoutePoint);
   }
 
