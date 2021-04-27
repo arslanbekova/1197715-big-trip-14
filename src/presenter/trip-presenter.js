@@ -48,11 +48,11 @@ export default class Trip {
         this._routePoints.sort((a, b) => {
           const aDuration = dayjs.duration(dayjs(a.dateTo).diff(dayjs(a.dateFrom))).asMilliseconds();
           const bDuration = dayjs.duration(dayjs(b.dateTo).diff(dayjs(b.dateFrom))).asMilliseconds();
-          return aDuration - bDuration;
+          return bDuration - aDuration;
         });
         break;
       case SortOption.TO_LOWEST_PRICE.value:
-        this._routePoints.sort((a, b) => a.basePrice - b.basePrice );
+        this._routePoints.sort((a, b) => b.basePrice - a.basePrice );
         break;
       default:
         this._routePoints = this._sourcedRoutePoints.slice();
