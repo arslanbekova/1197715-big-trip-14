@@ -55,6 +55,11 @@ export default class RoutePointPresenter {
     remove(prevEditRoutePointComponent);
   }
 
+  destroy() {
+    remove(this._routePointComponent);
+    remove(this._editRoutePointComponent);
+  }
+
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
       this._closeEditRoutePointForm();

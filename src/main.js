@@ -4,9 +4,13 @@ import SiteMenu from './view/site-menu';
 import FilterOptions from './view/filter-options';
 import {generateRoutePoint} from './mock/route-point';
 import {render} from './utils/render';
+import dayjs from 'dayjs';
 
 const EVENTS_COUNT = 20;
-const routePoints = Array(EVENTS_COUNT).fill('route point').map(generateRoutePoint);
+const routePoints = Array(EVENTS_COUNT)
+  .fill('route point')
+  .map(generateRoutePoint)
+  .sort((a, b) => dayjs(a.dateFrom).diff(dayjs(b.dateFrom)));
 
 const siteHeaderElement = document.querySelector('.page-header');
 const tripInfoContainer = siteHeaderElement.querySelector('.trip-main');

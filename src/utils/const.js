@@ -35,3 +35,31 @@ export const RenderPosition = {
   AFTERBEGIN: 'afterbegin',
   BEFOREEND: 'beforeend',
 };
+
+export const SortOption = {
+  DEFAULT: {
+    value: 'day',
+    isDisabled: false,
+    isChecked: true,
+  },
+  BY_EVENT: {
+    value: 'event',
+    isDisabled: true,
+    isChecked: false,
+  },
+  TO_SHORTEST_TIME: {
+    value: 'time',
+    isDisabled: false,
+    isChecked: false,
+  },
+  TO_LOWEST_PRICE: {
+    value: 'price',
+    isDisabled: false,
+    isChecked: false,
+  },
+  BY_OFFER: {
+    value: 'offer',
+    isDisabled: true,
+    isChecked: false,
+  },
+};
