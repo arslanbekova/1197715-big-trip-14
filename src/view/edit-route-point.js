@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import {restructuredDestinations} from '../mock/destinations';
+import {restructuredOffers} from '../mock/offers';
 import {ROUTE_POINT_TYPES} from '../utils/const';
 import {toUpperCaseFirstSymbol} from '../utils/general';
 import Smart from './smart';
@@ -119,9 +120,13 @@ export default class EditRoutePoint extends Smart {
   constructor(routePoint) {
     super();
     this._state = EditRoutePoint.parseDataToState(routePoint);
+    this._currentEventType = this._state.type;
 
     this._arrowClickHandler = this._arrowClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
+
+    this._setInnerHandlers();
   }
 
   getTemplate() {
@@ -146,6 +151,28 @@ export default class EditRoutePoint extends Smart {
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().addEventListener('submit', this._formSubmitHandler);
+  }
+
+  _eventTypeChangeHandler(evt) {
+    if (evt.target.hasAttribute('data-event-type')) {
+      const eventType = evt.target.dataset.eventType;
+
+      if (this._currentEventType === eventType) {
+        return;
+      }
+
+      this.updateState({
+        type: eventType,
+        offers: restructuredOffers[eventType],
+        stateIsOffers: Boolean(restructuredOffers[eventType].length),
+      });
+      //очистить список ранее выбранных опций
+    }
+  }
+
+  _setInnerHandlers() {
+    this.getElement()
+      .addEventListener('click', this._eventTypeChangeHandler);
   }
 
   //данные в состояние
