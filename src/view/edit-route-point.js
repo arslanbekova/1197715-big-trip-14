@@ -2,10 +2,13 @@ import dayjs from 'dayjs';
 import {restructuredDestinations} from '../mock/destinations';
 import {ROUTE_POINT_TYPES} from '../utils/const';
 import {toUpperCaseFirstSymbol} from '../utils/general';
-import Abstract from './abstract';
+import Smart from './smart';
 
 const createOfferTemplate = (offers, offerType) => {
-  return offers.map((offer, index) =>
+  return `<section class="event__section  event__section--offers">
+    <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+    <div class="event__available-offers">
+    ${offers.map((offer, index) =>
     `<div class="event__offer-selector">
       <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offerType}-${index+1}" type="checkbox" name="event-offer-${offerType}">
       <label class="event__offer-label" for="event-offer-${offerType}-${index+1}">
@@ -13,15 +16,18 @@ const createOfferTemplate = (offers, offerType) => {
         &plus;&euro;&nbsp;
         <span class="event__offer-price">${offer.price}</span>
       </label>
-    </div>`,
-  ).join('');
+    </div>`).join('')}
+    </div>
+  </section>`;
 };
 
 const createEventTypeTemplate = (eventTypes) => {
   return eventTypes.map((eventType) =>
     `<div class="event__type-item">
       <input id="event-type-${eventType}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventType}">
-      <label class="event__type-label  event__type-label--${eventType}" for="event-type-${eventType}-1">${toUpperCaseFirstSymbol(eventType)}</label>
+      <label class="event__type-label  event__type-label--${eventType}"
+        data-event-type="${eventType}"
+        for="event-type-${eventType}-1">${toUpperCaseFirstSymbol(eventType)}</label>
     </div>`,
   ).join('');
 };
@@ -32,11 +38,26 @@ const createEventDestinationTemplate = (destinations) => {
   ).join('');
 };
 
+const createEventDescriptionTemplate = (destination) => {
+  return `<section class="event__section  event__section--destination">
+    <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+    <p class="event__destination-description">${destination.description}</p>
+
+    <div class="event__photos-container">
+      <div class="event__photos-tape">
+      ${destination.pictures.map((picture) =>
+    `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join('')}
+      </div>
+    </div>
+  </section>`;
+};
+
 const createEditRoutePointTemplate = (routePoint) => {
-  const {dateFrom, dateTo, type, destination, basePrice, offers} = routePoint;
+  const {dateFrom, dateTo, type, destination, basePrice, offers, stateIsDescription, stateIsOffers} = routePoint;
   const offersTemplate = createOfferTemplate(offers, type);
   const eventTypesTemplate = createEventTypeTemplate(ROUTE_POINT_TYPES);
   const eventDestinationsTemplate = createEventDestinationTemplate(restructuredDestinations);
+  const eventDescriptionTemplate = createEventDescriptionTemplate(destination, stateIsDescription);
 
   return `<form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -88,32 +109,23 @@ const createEditRoutePointTemplate = (routePoint) => {
       </button>
     </header>
     <section class="event__details">
-      <section class="event__section  event__section--offers">
-        <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-        <div class="event__available-offers">
-          ${offersTemplate}
-        </div>
-      </section>
-
-      <section class="event__section  event__section--destination">
-        <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-        <p class="event__destination-description">${destination.description}</p>
-      </section>
+      ${stateIsOffers ? offersTemplate : ''}
+      ${stateIsDescription ? eventDescriptionTemplate : ''}
     </section>
   </form>`;
 };
 
-export default class EditRoutePoint extends Abstract {
+export default class EditRoutePoint extends Smart {
   constructor(routePoint) {
     super();
-    this._routePoint = routePoint;
+    this._state = EditRoutePoint.parseDataToState(routePoint);
 
     this._arrowClickHandler = this._arrowClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
   }
 
   getTemplate() {
-    return createEditRoutePointTemplate(this._routePoint);
+    return createEditRoutePointTemplate(this._state);
   }
 
   _arrowClickHandler(evt) {
@@ -128,11 +140,23 @@ export default class EditRoutePoint extends Abstract {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit();
+    this._callback.formSubmit(EditRoutePoint.parseSateToData(this._state));
   }
 
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().addEventListener('submit', this._formSubmitHandler);
+  }
+
+  //данные в состояние
+  static parseDataToState(routePoint) {
+    return Object.assign(
+      {},
+      routePoint,
+      {
+        stateIsOffers: Boolean(routePoint.offers.length),
+        stateIsDescription: Boolean(routePoint.destination.description.length),
+      },
+    );
   }
 }
