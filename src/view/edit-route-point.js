@@ -125,6 +125,7 @@ export default class EditRoutePoint extends Smart {
     this._arrowClickHandler = this._arrowClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
+    this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
 
     this._setInnerHandlers();
   }
@@ -155,24 +156,45 @@ export default class EditRoutePoint extends Smart {
 
   _eventTypeChangeHandler(evt) {
     if (evt.target.hasAttribute('data-event-type')) {
-      const eventType = evt.target.dataset.eventType;
+      const newEventType = evt.target.dataset.eventType;
+      const newOffers = restructuredOffers[newEventType];
 
-      if (this._currentEventType === eventType) {
+      if (this._currentEventType === newEventType) {
         return;
       }
 
       this.updateState({
-        type: eventType,
-        offers: restructuredOffers[eventType],
-        stateIsOffers: Boolean(restructuredOffers[eventType].length),
+        type: newEventType,
+        offers: newOffers,
+        stateIsOffers: Boolean(newOffers.length),
       });
       //очистить список ранее выбранных опций
     }
   }
 
+  _destinationChangeHandler(evt) {
+    const newDestinationName = evt.target.value;
+    const newDestination = restructuredDestinations[newDestinationName];
+
+    this.updateState({
+      destination: {
+        name: newDestinationName,
+        description: newDestination.description,
+        pictures: newDestination.pictures,
+
+      },
+      stateIsDescription: Boolean(newDestination.description.length),
+    });
+  }
+
   _setInnerHandlers() {
     this.getElement()
+      .querySelector('.event__type-group')
       .addEventListener('click', this._eventTypeChangeHandler);
+
+    this.getElement()
+      .querySelector('.event__input--destination')
+      .addEventListener('change', this._destinationChangeHandler);
   }
 
   //данные в состояние
