@@ -187,6 +187,12 @@ export default class EditRoutePoint extends Smart {
     });
   }
 
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setArrowClickHandler(this._callback.arrowClick);
+  }
+
   _setInnerHandlers() {
     this.getElement()
       .querySelector('.event__type-group')
