@@ -4,7 +4,6 @@ import duration from 'dayjs/plugin/duration';
 import {getRandomElement, getRandomInt} from '../utils/general';
 import {ROUTE_POINT_TYPES, MaxCount, Price} from '../utils/const';
 import {generateDestinations} from './destinations';
-import {restructuredOffers} from './offers';
 
 const generateDate = (date = undefined) => {
   dayjs.extend(duration);
@@ -28,7 +27,7 @@ export const generateRoutePoint = () => {
     destination: getRandomElement(destinations),
     id: nanoid(MaxCount.ID_SYMBOLS),
     isFavorite: Boolean(getRandomInt()),
-    offers: restructuredOffers[type],
+    offers: [],
     type,
   };
 };

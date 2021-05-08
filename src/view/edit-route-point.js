@@ -5,14 +5,20 @@ import {ROUTE_POINT_TYPES} from '../utils/const';
 import {toUpperCaseFirstSymbol} from '../utils/general';
 import Smart from './smart';
 
-const createOfferTemplate = (offers, offerType) => {
+const createOfferTemplate = (eventType) => {
+  const avaliableOffers = restructuredOffers[eventType];
   return `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
-    ${offers.map((offer, index) =>
+    ${avaliableOffers.map((offer, index) =>
     `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offerType}-${index+1}" type="checkbox" name="event-offer-${offerType}">
-      <label class="event__offer-label" for="event-offer-${offerType}-${index+1}">
+      <input class="event__offer-checkbox visually-hidden"
+        data-offer-title="${offer.title}"
+        data-offer-price="${offer.price}"
+        id="event-offer-${eventType}-${index+1}"
+        type="checkbox"
+        name="event-offer-${eventType}">
+      <label class="event__offer-label" for="event-offer-${eventType}-${index+1}">
         <span class="event__offer-title">${offer.title}</span>
         &plus;&euro;&nbsp;
         <span class="event__offer-price">${offer.price}</span>
@@ -54,8 +60,8 @@ const createEventDescriptionTemplate = (destination) => {
 };
 
 const createEditRoutePointTemplate = (routePoint) => {
-  const {dateFrom, dateTo, type, destination, basePrice, offers, stateIsDescription, stateIsOffers} = routePoint;
-  const offersTemplate = createOfferTemplate(offers, type);
+  const {dateFrom, dateTo, type, destination, basePrice, stateIsDescription, stateIsOffers} = routePoint;
+  const offersTemplate = createOfferTemplate(type);
   const eventTypesTemplate = createEventTypeTemplate(ROUTE_POINT_TYPES);
   const eventDestinationsTemplate = createEventDestinationTemplate(restructuredDestinations);
   const eventDescriptionTemplate = createEventDescriptionTemplate(destination, stateIsDescription);
@@ -157,7 +163,6 @@ export default class EditRoutePoint extends Smart {
   _eventTypeChangeHandler(evt) {
     if (evt.target.hasAttribute('data-event-type')) {
       const newEventType = evt.target.dataset.eventType;
-      const newOffers = restructuredOffers[newEventType];
 
       if (this._currentEventType === newEventType) {
         return;
@@ -165,10 +170,7 @@ export default class EditRoutePoint extends Smart {
 
       this.updateState({
         type: newEventType,
-        offers: newOffers,
-        stateIsOffers: Boolean(newOffers.length),
       });
-      //очистить список ранее выбранных опций
     }
   }
 
@@ -205,11 +207,13 @@ export default class EditRoutePoint extends Smart {
 
   //данные в состояние
   static parseDataToState(routePoint) {
+    const eventType = routePoint.type;
+    const avaliableOffers = restructuredOffers[eventType];
     return Object.assign(
       {},
       routePoint,
       {
-        stateIsOffers: Boolean(routePoint.offers.length),
+        stateIsOffers: Boolean(avaliableOffers.length),
         stateIsDescription: Boolean(routePoint.destination.description.length),
       },
     );
