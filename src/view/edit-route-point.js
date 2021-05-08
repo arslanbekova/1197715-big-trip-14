@@ -1,8 +1,9 @@
 import dayjs from 'dayjs';
+import _ from 'lodash';
 import {restructuredDestinations} from '../mock/destinations';
 import {restructuredOffers} from '../mock/offers';
 import {ROUTE_POINT_TYPES} from '../utils/const';
-import {toUpperCaseFirstSymbol} from '../utils/general';
+import {toUpperCaseFirstSymbol, removeArrayElement} from '../utils/general';
 import Smart from './smart';
 
 const createOfferTemplate = (eventType) => {
@@ -171,6 +172,7 @@ export default class EditRoutePoint extends Smart {
 
       this.updateState({
         type: newEventType,
+        offers: [],
       });
     }
   }
@@ -190,6 +192,14 @@ export default class EditRoutePoint extends Smart {
     });
   }
 
+  _removeEqualOption(choosedOffer, choosedOffers) {
+    const equalOffer = choosedOffers.find((element) => _.isEqual(element, choosedOffer));
+    removeArrayElement(equalOffer, choosedOffers);
+    this.updateState({
+      offers: choosedOffers,
+    }, true);
+  }
+
   _addExtraOption(evt) {
     const offerTitle = evt.target.dataset.offerTitle;
     const offerPrice = evt.target.dataset.offerPrice;
@@ -198,6 +208,12 @@ export default class EditRoutePoint extends Smart {
       price: offerPrice,
     };
     const choosedOffers = this._state.offers.slice();
+    const isEqualOffer = choosedOffers.some((element) => _.isEqual(element, choosedOffer));
+
+    if (isEqualOffer) {
+      this._removeEqualOption(choosedOffer, choosedOffers);
+      return;
+    }
 
     choosedOffers.push(choosedOffer);
 
