@@ -33,3 +33,10 @@ export const updateItem = (items, update) => {
     ...items.slice(index + 1),
   ];
 };
+
+export const removeArrayElement = (element, array) => {
+  const index = array.indexOf(element);
+  if (index > -1) {
+    array.splice(index, 1);
+  }
+};
