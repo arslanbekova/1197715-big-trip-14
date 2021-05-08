@@ -132,6 +132,7 @@ export default class EditRoutePoint extends Smart {
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
+    this._addExtraOption = this._addExtraOption.bind(this);
 
     this._setInnerHandlers();
   }
@@ -189,6 +190,22 @@ export default class EditRoutePoint extends Smart {
     });
   }
 
+  _addExtraOption(evt) {
+    const offerTitle = evt.target.dataset.offerTitle;
+    const offerPrice = evt.target.dataset.offerPrice;
+    const choosedOffer = {
+      title: offerTitle,
+      price: offerPrice,
+    };
+    const choosedOffers = this._state.offers.slice();
+
+    choosedOffers.push(choosedOffer);
+
+    this.updateState({
+      offers: choosedOffers,
+    });
+  }
+
   restoreHandlers() {
     this._setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
@@ -203,6 +220,12 @@ export default class EditRoutePoint extends Smart {
     this.getElement()
       .querySelector('.event__input--destination')
       .addEventListener('change', this._destinationChangeHandler);
+
+    if (this._state.stateIsOffers) {
+      this.getElement()
+        .querySelectorAll('.event__offer-checkbox')
+        .forEach((element) => element.addEventListener('change', this._addExtraOption));
+    }
   }
 
   //данные в состояние
