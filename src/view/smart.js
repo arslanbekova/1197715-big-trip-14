@@ -6,7 +6,7 @@ export default class Smart extends Abstract {
     this._state = {};
   }
 
-  updateState(update) {
+  updateState(update, justDataUpdating) {
     if (!update) {
       return;
     }
@@ -16,6 +16,10 @@ export default class Smart extends Abstract {
       this._state,
       update,
     );
+
+    if (justDataUpdating) {
+      return;
+    }
 
     this.updateElement();
   }

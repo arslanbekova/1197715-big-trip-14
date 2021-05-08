@@ -203,7 +203,7 @@ export default class EditRoutePoint extends Smart {
 
     this.updateState({
       offers: choosedOffers,
-    });
+    }, true);
   }
 
   restoreHandlers() {
