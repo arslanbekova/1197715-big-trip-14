@@ -74,6 +74,7 @@ export default class RoutePointPresenter {
   }
 
   _closeEditRoutePointForm() {
+    this._editRoutePointComponent.resetState(this._routePoint);
     replace(this._routePointComponent, this._editRoutePointComponent);
     document.removeEventListener('keydown', this._escKeyDownHandler);
     this._mode = Mode.DEFAULT;
@@ -82,6 +83,7 @@ export default class RoutePointPresenter {
   _escKeyDownHandler(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
+      this._editRoutePointComponent.resetState(this._routePoint);
       this._closeEditRoutePointForm();
     }
   }

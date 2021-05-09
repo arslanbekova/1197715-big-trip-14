@@ -154,7 +154,7 @@ export default class EditRoutePoint extends Smart {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit(EditRoutePoint.parseSateToData(this._state));
+    this._callback.formSubmit(EditRoutePoint.parseStateToData(this._state));
   }
 
   setFormSubmitHandler(callback) {
@@ -262,7 +262,7 @@ export default class EditRoutePoint extends Smart {
   }
 
   //состояние в данные
-  static parseSateToData(state) {
+  static parseStateToData(state) {
     state = Object.assign({}, state);
 
     if (!state.stateIsDescription) {
@@ -277,5 +277,11 @@ export default class EditRoutePoint extends Smart {
     delete state.stateIsDescription;
 
     return state;
+  }
+
+  resetState(routePoint) {
+    this.updateState(
+      EditRoutePoint.parseStateToData(routePoint),
+    );
   }
 }
