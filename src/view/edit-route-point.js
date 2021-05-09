@@ -260,4 +260,22 @@ export default class EditRoutePoint extends Smart {
       },
     );
   }
+
+  //состояние в данные
+  static parseSateToData(state) {
+    state = Object.assign({}, state);
+
+    if (!state.stateIsDescription) {
+      Object.assign({}, state.destination,
+        {
+          description: '',
+          pictures: [],
+        });
+    }
+
+    delete state.stateIsOffers;
+    delete state.stateIsDescription;
+
+    return state;
+  }
 }
