@@ -170,9 +170,12 @@ export default class EditRoutePoint extends Smart {
         return;
       }
 
+      const avaliableOffers = restructuredOffers[newEventType];
+
       this.updateState({
         type: newEventType,
         offers: [],
+        stateIsOffers: Boolean(avaliableOffers.length),
       });
     }
   }
