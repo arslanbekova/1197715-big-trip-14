@@ -148,10 +148,40 @@ export default class NewRoutePoint extends Smart {
   constructor(newRoutePoint = INITIAL_STATE) {
     super();
     this._state = NewRoutePoint.parseDataToState(newRoutePoint);
+    this._currentEventType = this._state.type;
+
+    this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
+
+    this._setInnerHandlers();
   }
 
   getTemplate() {
     return createNewRoutePointTemplate(this._state);
+  }
+
+  _eventTypeChangeHandler(evt) {
+    if (evt.target.hasAttribute('data-event-type')) {
+      const newEventType = evt.target.dataset.eventType;
+
+      if (this._currentEventType === newEventType) {
+        return;
+      }
+
+      const avaliableOffers = restructuredOffers[newEventType];
+
+      this.updateState({
+        type: newEventType,
+        offers: [],
+        stateIsOffers: Boolean(avaliableOffers.length),
+        stateIsType: true,
+      });
+    }
+  }
+
+  _setInnerHandlers() {
+    this.getElement()
+      .querySelector('.event__type-group')
+      .addEventListener('click', this._eventTypeChangeHandler);
   }
 
   //данные в состояние
