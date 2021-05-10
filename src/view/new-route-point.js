@@ -1,9 +1,10 @@
 import Smart from './smart';
 import dayjs from 'dayjs';
+import _ from 'lodash';
 import {restructuredDestinations} from '../mock/destinations';
 import {restructuredOffers} from '../mock/offers';
 import {ROUTE_POINT_TYPES} from '../utils/const';
-import {toUpperCaseFirstSymbol} from '../utils/general';
+import {toUpperCaseFirstSymbol, removeArrayElement} from '../utils/general';
 
 const INITIAL_STATE = {
   basePrice: null,
@@ -152,6 +153,7 @@ export default class NewRoutePoint extends Smart {
 
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
+    this._addExtraOption = this._addExtraOption.bind(this);
 
     this._setInnerHandlers();
   }
@@ -194,6 +196,36 @@ export default class NewRoutePoint extends Smart {
     });
   }
 
+  _removeEqualOption(choosedOffer, choosedOffers) {
+    const equalOffer = choosedOffers.find((element) => _.isEqual(element, choosedOffer));
+    removeArrayElement(equalOffer, choosedOffers);
+    this.updateState({
+      offers: choosedOffers,
+    }, true);
+  }
+
+  _addExtraOption(evt) {
+    const offerTitle = evt.target.dataset.offerTitle;
+    const offerPrice = evt.target.dataset.offerPrice;
+    const choosedOffer = {
+      title: offerTitle,
+      price: offerPrice,
+    };
+    const choosedOffers = this._state.offers.slice();
+    const isEqualOffer = choosedOffers.some((element) => _.isEqual(element, choosedOffer));
+
+    if (isEqualOffer) {
+      this._removeEqualOption(choosedOffer, choosedOffers);
+      return;
+    }
+
+    choosedOffers.push(choosedOffer);
+
+    this.updateState({
+      offers: choosedOffers,
+    }, true);
+  }
+
   restoreHandlers() {
     this._setInnerHandlers();
     // this.setFormSubmitHandler(this._callback.formSubmit);
@@ -208,6 +240,12 @@ export default class NewRoutePoint extends Smart {
     this.getElement()
       .querySelector('.event__input--destination')
       .addEventListener('change', this._destinationChangeHandler);
+
+    if (this._state.stateIsOffers) {
+      this.getElement()
+        .querySelectorAll('.event__offer-checkbox')
+        .forEach((element) => element.addEventListener('change', this._addExtraOption));
+    }
   }
 
   //данные в состояние
