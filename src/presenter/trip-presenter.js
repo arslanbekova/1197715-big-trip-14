@@ -31,6 +31,7 @@ export default class Trip {
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._newEventFormOpenHandler = this._newEventFormOpenHandler.bind(this);
     this._handleNewEventCancelButtonClick = this._handleNewEventCancelButtonClick.bind(this);
+    this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
   init(routePoints) {
@@ -71,10 +72,20 @@ export default class Trip {
   _newEventFormOpenHandler() {
     render(this._tripEventsList, this._newRoutePointComponent, RenderPosition.AFTERBEGIN);
     this._newRoutePointComponent.setCancelButtonClickHandler(this._handleNewEventCancelButtonClick);
+    document.addEventListener('keydown', this._escKeyDownHandler);
   }
 
   _closeNewRoutePointForm() {
+    // this._editRoutePointComponent.resetState(this._routePoint);
     remove(this._newRoutePointComponent);
+    document.removeEventListener('keydown', this._escKeyDownHandler);
+  }
+
+  _escKeyDownHandler(evt) {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      this._closeNewRoutePointForm();
+    }
   }
 
   _handleNewEventCancelButtonClick() {
