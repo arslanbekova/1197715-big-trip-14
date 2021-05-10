@@ -2,6 +2,7 @@ import NoRoutePoints from '../view/no-route-points';
 import CostInfo from '../view/cost-info';
 import TripInfo from '../view/trip-info';
 import SortOptions from '../view/sort-options';
+import NewRoutePoint from '../view/new-route-point';
 import RoutePointPresenter from './route-point-presenter';
 import {render} from '../utils/render';
 import {updateItem} from '../utils/general';
@@ -23,16 +24,21 @@ export default class Trip {
     this._costInfoComponent = new CostInfo();
     this._sortComponent = new SortOptions();
     this._noRoutePointsComponent = new NoRoutePoints();
+    this._newRoutePointComponent = new NewRoutePoint();
 
     this._handleAddToFavorites = this._handleAddToFavorites.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+    this._newEventFormOpenHandler = this._newEventFormOpenHandler.bind(this);
   }
 
   init(routePoints) {
     this._routePoints = routePoints.slice();
     this._sourcedRoutePoints = routePoints.slice();
     this._renderTrip();
+    document
+      .querySelector('.trip-main__event-add-btn')
+      .addEventListener('click', this._newEventFormOpenHandler);
   }
 
   _clearRoutePoints() {
@@ -58,6 +64,10 @@ export default class Trip {
         this._routePoints = this._sourcedRoutePoints.slice();
     }
     this._currentSortType = sortType;
+  }
+
+  _newEventFormOpenHandler() {
+    render(this._tripEventsList, this._newRoutePointComponent, RenderPosition.AFTERBEGIN);
   }
 
   _handleSortTypeChange(sortType) {
