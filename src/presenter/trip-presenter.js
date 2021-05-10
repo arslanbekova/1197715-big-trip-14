@@ -4,7 +4,7 @@ import TripInfo from '../view/trip-info';
 import SortOptions from '../view/sort-options';
 import NewRoutePoint from '../view/new-route-point';
 import RoutePointPresenter from './route-point-presenter';
-import {render, remove} from '../utils/render';
+import {render} from '../utils/render';
 import {updateItem} from '../utils/general';
 import {RenderPosition, SortOption} from '../utils/const';
 import dayjs from 'dayjs';
@@ -24,14 +24,11 @@ export default class Trip {
     this._costInfoComponent = new CostInfo();
     this._sortComponent = new SortOptions();
     this._noRoutePointsComponent = new NoRoutePoints();
-    this._newRoutePointComponent = new NewRoutePoint();
 
     this._handleAddToFavorites = this._handleAddToFavorites.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._newEventFormOpenHandler = this._newEventFormOpenHandler.bind(this);
-    this._handleNewEventCancelButtonClick = this._handleNewEventCancelButtonClick.bind(this);
-    this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
   init(routePoints) {
@@ -70,26 +67,7 @@ export default class Trip {
   }
 
   _newEventFormOpenHandler() {
-    render(this._tripEventsList, this._newRoutePointComponent, RenderPosition.AFTERBEGIN);
-    this._newRoutePointComponent.setCancelButtonClickHandler(this._handleNewEventCancelButtonClick);
-    document.addEventListener('keydown', this._escKeyDownHandler);
-  }
-
-  _closeNewRoutePointForm() {
-    // this._editRoutePointComponent.resetState(this._routePoint);
-    remove(this._newRoutePointComponent);
-    document.removeEventListener('keydown', this._escKeyDownHandler);
-  }
-
-  _escKeyDownHandler(evt) {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
-      this._closeNewRoutePointForm();
-    }
-  }
-
-  _handleNewEventCancelButtonClick() {
-    this._closeNewRoutePointForm();
+    render(this._tripEventsList, new NewRoutePoint(), RenderPosition.AFTERBEGIN);
   }
 
   _handleSortTypeChange(sortType) {

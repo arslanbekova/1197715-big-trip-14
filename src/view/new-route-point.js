@@ -5,6 +5,7 @@ import {restructuredDestinations} from '../mock/destinations';
 import {restructuredOffers} from '../mock/offers';
 import {ROUTE_POINT_TYPES} from '../utils/const';
 import {toUpperCaseFirstSymbol, removeArrayElement} from '../utils/general';
+import {remove} from '../utils/render';
 
 const DEFAULT_EVENT_TYPE = 'flight';
 const INITIAL_STATE = {
@@ -14,10 +15,7 @@ const INITIAL_STATE = {
   destination: {
     description: '',
     name: '',
-    pictures: [{
-      src: '',
-      description: '',
-    }],
+    pictures: [],
   },
   id: null,
   isFavorite: false,
@@ -155,6 +153,7 @@ export default class NewRoutePoint extends Smart {
     this._currentEventType = this._state.type;
 
     this._cancelButtonClickHandler = this._cancelButtonClickHandler.bind(this);
+    this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
     this._addExtraOption = this._addExtraOption.bind(this);
@@ -166,14 +165,20 @@ export default class NewRoutePoint extends Smart {
     return createNewRoutePointTemplate(this._state);
   }
 
-  _cancelButtonClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.cancelButtonClick();
+  _escKeyDownHandler(evt) {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      this._closeNewRoutePointForm();
+    }
   }
 
-  setCancelButtonClickHandler(callback) {
-    this._callback.cancelButtonClick = callback;
-    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._cancelButtonClickHandler);
+  _closeNewRoutePointForm() {
+    remove(this);
+    document.removeEventListener('keydown', this._escKeyDownHandler);
+  }
+
+  _cancelButtonClickHandler() {
+    this._closeNewRoutePointForm();
   }
 
   // _formSubmitHandler(evt) {
@@ -194,6 +199,7 @@ export default class NewRoutePoint extends Smart {
         return;
       }
 
+      this._currentEventType = newEventType;
       const avaliableOffers = restructuredOffers[newEventType];
 
       this.updateState({
@@ -252,7 +258,6 @@ export default class NewRoutePoint extends Smart {
   restoreHandlers() {
     this._setInnerHandlers();
     // this.setFormSubmitHandler(this._callback.formSubmit);
-    this.setCancelButtonClickHandler(this._callback.cancelButtonClickHandler);
   }
 
   _setInnerHandlers() {
@@ -269,6 +274,12 @@ export default class NewRoutePoint extends Smart {
         .querySelectorAll('.event__offer-checkbox')
         .forEach((element) => element.addEventListener('change', this._addExtraOption));
     }
+
+    this.getElement()
+      .querySelector('.event__reset-btn')
+      .addEventListener('click', this._cancelButtonClickHandler);
+
+    document.addEventListener('keydown', this._escKeyDownHandler);
   }
 
   //данные в состояние
