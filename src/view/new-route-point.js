@@ -154,6 +154,7 @@ export default class NewRoutePoint extends Smart {
     this._state = NewRoutePoint.parseDataToState(newRoutePoint);
     this._currentEventType = this._state.type;
 
+    this._cancelButtonClickHandler = this._cancelButtonClickHandler.bind(this);
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
     this._addExtraOption = this._addExtraOption.bind(this);
@@ -164,6 +165,26 @@ export default class NewRoutePoint extends Smart {
   getTemplate() {
     return createNewRoutePointTemplate(this._state);
   }
+
+  _cancelButtonClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.cancelButtonClick();
+  }
+
+  setCancelButtonClickHandler(callback) {
+    this._callback.cancelButtonClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._cancelButtonClickHandler);
+  }
+
+  // _formSubmitHandler(evt) {
+  //   evt.preventDefault();
+  //   this._callback.formSubmit(EditRoutePoint.parseStateToData(this._state));
+  // }
+
+  // setFormSubmitHandler(callback) {
+  //   this._callback.formSubmit = callback;
+  //   this.getElement().addEventListener('submit', this._formSubmitHandler);
+  // }
 
   _eventTypeChangeHandler(evt) {
     if (evt.target.hasAttribute('data-event-type')) {
@@ -231,7 +252,7 @@ export default class NewRoutePoint extends Smart {
   restoreHandlers() {
     this._setInnerHandlers();
     // this.setFormSubmitHandler(this._callback.formSubmit);
-    // this.setArrowClickHandler(this._callback.arrowClick);
+    this.setCancelButtonClickHandler(this._callback.cancelButtonClickHandler);
   }
 
   _setInnerHandlers() {

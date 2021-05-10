@@ -4,7 +4,7 @@ import TripInfo from '../view/trip-info';
 import SortOptions from '../view/sort-options';
 import NewRoutePoint from '../view/new-route-point';
 import RoutePointPresenter from './route-point-presenter';
-import {render} from '../utils/render';
+import {render, remove} from '../utils/render';
 import {updateItem} from '../utils/general';
 import {RenderPosition, SortOption} from '../utils/const';
 import dayjs from 'dayjs';
@@ -30,12 +30,14 @@ export default class Trip {
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._newEventFormOpenHandler = this._newEventFormOpenHandler.bind(this);
+    this._handleNewEventCancelButtonClick = this._handleNewEventCancelButtonClick.bind(this);
   }
 
   init(routePoints) {
     this._routePoints = routePoints.slice();
     this._sourcedRoutePoints = routePoints.slice();
     this._renderTrip();
+
     document
       .querySelector('.trip-main__event-add-btn')
       .addEventListener('click', this._newEventFormOpenHandler);
@@ -68,6 +70,15 @@ export default class Trip {
 
   _newEventFormOpenHandler() {
     render(this._tripEventsList, this._newRoutePointComponent, RenderPosition.AFTERBEGIN);
+    this._newRoutePointComponent.setCancelButtonClickHandler(this._handleNewEventCancelButtonClick);
+  }
+
+  _closeNewRoutePointForm() {
+    remove(this._newRoutePointComponent);
+  }
+
+  _handleNewEventCancelButtonClick() {
+    this._closeNewRoutePointForm();
   }
 
   _handleSortTypeChange(sortType) {
