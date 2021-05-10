@@ -6,6 +6,7 @@ import {restructuredOffers} from '../mock/offers';
 import {ROUTE_POINT_TYPES} from '../utils/const';
 import {toUpperCaseFirstSymbol, removeArrayElement} from '../utils/general';
 
+const DEFAULT_EVENT_TYPE = 'flight';
 const INITIAL_STATE = {
   basePrice: null,
   dateFrom: null,
@@ -21,10 +22,8 @@ const INITIAL_STATE = {
   id: null,
   isFavorite: false,
   offers: [],
-  type: '',
+  type: DEFAULT_EVENT_TYPE,
 };
-
-const DEFAULT_EVENT_TYPE = 'flight';
 
 const createEventTypeTemplate = (eventTypes) => {
   return eventTypes.map((eventType) =>
@@ -86,7 +85,7 @@ const createEventDescriptionTemplate = (destination) => {
 
 export const createNewRoutePointTemplate = (newRoutePoint) => {
   const {dateFrom, dateTo, type, destination, basePrice,
-    stateIsDateFrom, stateIsDateTo, stateIsBasePrice, stateIsType, stateIsDestinationName, stateIsDescription, stateIsOffers} = newRoutePoint;
+    stateIsDateFrom, stateIsDateTo, stateIsBasePrice, stateIsDestinationName, stateIsDescription, stateIsOffers} = newRoutePoint;
   const offersTemplate = createOfferTemplate(type, stateIsOffers);
   const eventTypesTemplate = createEventTypeTemplate(ROUTE_POINT_TYPES);
   const eventDestinationsTemplate = createEventDestinationTemplate(restructuredDestinations);
@@ -97,7 +96,7 @@ export const createNewRoutePointTemplate = (newRoutePoint) => {
       <div class="event__type-wrapper">
         <label class="event__type  event__type-btn" for="event-type-toggle-1">
           <span class="visually-hidden">Choose event type</span>
-          <img class="event__type-icon" width="17" height="17" src="img/icons/${stateIsType ? type : DEFAULT_EVENT_TYPE}.png" alt="Event type icon">
+          <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
         </label>
         <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -111,7 +110,7 @@ export const createNewRoutePointTemplate = (newRoutePoint) => {
 
       <div class="event__field-group  event__field-group--destination">
         <label class="event__label  event__type-output" for="event-destination-1">
-          ${stateIsType ? type : DEFAULT_EVENT_TYPE}
+          ${type}
         </label>
         <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${stateIsDestinationName ? destination.name : ''}" list="destination-list-1">
         <datalist id="destination-list-1">
@@ -176,7 +175,6 @@ export default class NewRoutePoint extends Smart {
         type: newEventType,
         offers: [],
         stateIsOffers: Boolean(avaliableOffers.length),
-        stateIsType: true,
       });
     }
   }
@@ -250,6 +248,8 @@ export default class NewRoutePoint extends Smart {
 
   //данные в состояние
   static parseDataToState(newRoutePoint) {
+    const eventType = newRoutePoint.type;
+    const avaliableOffers = restructuredOffers[eventType];
     return Object.assign(
       {},
       newRoutePoint,
@@ -257,9 +257,8 @@ export default class NewRoutePoint extends Smart {
         stateIsDateFrom: newRoutePoint.dateFrom !== null,
         stateIsDateTo: newRoutePoint.dateTo !== null,
         stateIsBasePrice: newRoutePoint.basePrice !== null,
-        stateIsType: newRoutePoint.type !== '',
         stateIsDestinationName: newRoutePoint.destination.name !== '',
-        stateIsOffers: Boolean(newRoutePoint.offers.length),
+        stateIsOffers: Boolean(avaliableOffers.length),
         stateIsDescription: Boolean(newRoutePoint.destination.description.length),
       },
     );
