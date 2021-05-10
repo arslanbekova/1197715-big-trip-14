@@ -153,6 +153,7 @@ export default class NewRoutePoint extends Smart {
     this._currentEventType = this._state.type;
 
     this._cancelButtonClickHandler = this._cancelButtonClickHandler.bind(this);
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
@@ -173,7 +174,7 @@ export default class NewRoutePoint extends Smart {
   }
 
   _closeNewRoutePointForm() {
-    remove(this);
+    remove(NewRoutePoint);
     document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
@@ -181,15 +182,10 @@ export default class NewRoutePoint extends Smart {
     this._closeNewRoutePointForm();
   }
 
-  // _formSubmitHandler(evt) {
-  //   evt.preventDefault();
-  //   this._callback.formSubmit(EditRoutePoint.parseStateToData(this._state));
-  // }
-
-  // setFormSubmitHandler(callback) {
-  //   this._callback.formSubmit = callback;
-  //   this.getElement().addEventListener('submit', this._formSubmitHandler);
-  // }
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    NewRoutePoint.parseStateToData(this._state);
+  }
 
   _eventTypeChangeHandler(evt) {
     if (evt.target.hasAttribute('data-event-type')) {
@@ -257,7 +253,6 @@ export default class NewRoutePoint extends Smart {
 
   restoreHandlers() {
     this._setInnerHandlers();
-    // this.setFormSubmitHandler(this._callback.formSubmit);
   }
 
   _setInnerHandlers() {
@@ -280,6 +275,10 @@ export default class NewRoutePoint extends Smart {
       .addEventListener('click', this._cancelButtonClickHandler);
 
     document.addEventListener('keydown', this._escKeyDownHandler);
+
+    this.getElement()
+      .querySelector('.event__save-btn')
+      .addEventListener('click', this._formSubmitHandler);
   }
 
   //данные в состояние
@@ -299,4 +298,45 @@ export default class NewRoutePoint extends Smart {
       },
     );
   }
+
+  static parseStateToData(state) {
+    state = Object.assign({}, state);
+
+    if (!state.stateIsDestinationName) {
+      Object.assign({}, state.destination,
+        {
+          name: '',
+        });
+    }
+
+    if (!state.stateIsDateFrom) {
+      state.dateFrom = null;
+    }
+
+    if (!state.stateIsDateTo) {
+      state.dateTo = null;
+    }
+
+    if (!state.stateIsBasePrice) {
+      state.basePrice = null;
+    }
+
+    if (!state.stateIsDescription) {
+      Object.assign({}, state.destination,
+        {
+          description: '',
+          pictures: [],
+        });
+    }
+
+    delete state.stateIsDestinationName;
+    delete state.stateIsDateFrom;
+    delete state.stateIsDateTo;
+    delete state.stateIsBasePrice;
+    delete state.stateIsOffers;
+    delete state.stateIsDescription;
+
+    return state;
+  }
+
 }
