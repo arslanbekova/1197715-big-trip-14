@@ -151,6 +151,7 @@ export default class NewRoutePoint extends Smart {
     this._currentEventType = this._state.type;
 
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
+    this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
 
     this._setInnerHandlers();
   }
@@ -178,10 +179,35 @@ export default class NewRoutePoint extends Smart {
     }
   }
 
+  _destinationChangeHandler(evt) {
+    const newDestinationName = evt.target.value;
+    const newDestination = restructuredDestinations[newDestinationName];
+
+    this.updateState({
+      destination: {
+        name: newDestinationName,
+        description: newDestination.description,
+        pictures: newDestination.pictures,
+      },
+      stateIsDescription: Boolean(newDestination.description.length),
+      stateIsDestinationName: true,
+    });
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    // this.setFormSubmitHandler(this._callback.formSubmit);
+    // this.setArrowClickHandler(this._callback.arrowClick);
+  }
+
   _setInnerHandlers() {
     this.getElement()
       .querySelector('.event__type-group')
       .addEventListener('click', this._eventTypeChangeHandler);
+
+    this.getElement()
+      .querySelector('.event__input--destination')
+      .addEventListener('change', this._destinationChangeHandler);
   }
 
   //данные в состояние
