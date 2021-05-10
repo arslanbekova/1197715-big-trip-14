@@ -83,7 +83,6 @@ export default class RoutePointPresenter {
   _escKeyDownHandler(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      this._editRoutePointComponent.resetState(this._routePoint);
       this._closeEditRoutePointForm();
     }
   }
