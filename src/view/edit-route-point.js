@@ -6,27 +6,31 @@ import {ROUTE_POINT_TYPES} from '../utils/const';
 import {toUpperCaseFirstSymbol, removeArrayElement} from '../utils/general';
 import Smart from './smart';
 
-const createOfferTemplate = (eventType) => {
-  const avaliableOffers = restructuredOffers[eventType];
-  return `<section class="event__section  event__section--offers">
-    <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-    <div class="event__available-offers">
-    ${avaliableOffers.map((offer, index) =>
+const createOfferTemplate = (eventType, isOffers) => {
+  if (isOffers) {
+    const avaliableOffers = restructuredOffers[eventType];
+    return `<section class="event__section  event__section--offers">
+      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+      <div class="event__available-offers">
+      ${avaliableOffers.map((offer, index) =>
     `<div class="event__offer-selector">
-      <input class="event__offer-checkbox visually-hidden"
-        data-offer-title="${offer.title}"
-        data-offer-price="${offer.price}"
-        id="event-offer-${eventType}-${index+1}"
-        type="checkbox"
-        name="event-offer-${eventType}">
-      <label class="event__offer-label" for="event-offer-${eventType}-${index+1}">
-        <span class="event__offer-title">${offer.title}</span>
-        &plus;&euro;&nbsp;
-        <span class="event__offer-price">${offer.price}</span>
-      </label>
-    </div>`).join('')}
-    </div>
-  </section>`;
+        <input class="event__offer-checkbox visually-hidden"
+          data-offer-title="${offer.title}"
+          data-offer-price="${offer.price}"
+          id="event-offer-${eventType}-${index+1}"
+          type="checkbox"
+          name="event-offer-${eventType}">
+        <label class="event__offer-label" for="event-offer-${eventType}-${index+1}">
+          <span class="event__offer-title">${offer.title}</span>
+          &plus;&euro;&nbsp;
+          <span class="event__offer-price">${offer.price}</span>
+        </label>
+      </div>`).join('')}
+      </div>
+    </section>`;
+  } else {
+    return '';
+  }
 };
 
 const createEventTypeTemplate = (eventTypes) => {
@@ -46,23 +50,27 @@ const createEventDestinationTemplate = (destinations) => {
   ).join('');
 };
 
-const createEventDescriptionTemplate = (destination) => {
-  return `<section class="event__section  event__section--destination">
-    <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-    <p class="event__destination-description">${destination.description}</p>
+const createEventDescriptionTemplate = (destination, isDescriptioin) => {
+  if (isDescriptioin) {
+    return `<section class="event__section  event__section--destination">
+      <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+      <p class="event__destination-description">${destination.description}</p>
 
-    <div class="event__photos-container">
-      <div class="event__photos-tape">
-      ${destination.pictures.map((picture) =>
+      <div class="event__photos-container">
+        <div class="event__photos-tape">
+        ${destination.pictures.map((picture) =>
     `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join('')}
+        </div>
       </div>
-    </div>
-  </section>`;
+    </section>`;
+  } else {
+    return '';
+  }
 };
 
 const createEditRoutePointTemplate = (routePoint) => {
   const {dateFrom, dateTo, type, destination, basePrice, stateIsDescription, stateIsOffers} = routePoint;
-  const offersTemplate = createOfferTemplate(type);
+  const offersTemplate = createOfferTemplate(type, stateIsOffers);
   const eventTypesTemplate = createEventTypeTemplate(ROUTE_POINT_TYPES);
   const eventDestinationsTemplate = createEventDestinationTemplate(restructuredDestinations);
   const eventDescriptionTemplate = createEventDescriptionTemplate(destination, stateIsDescription);
@@ -117,8 +125,8 @@ const createEditRoutePointTemplate = (routePoint) => {
       </button>
     </header>
     <section class="event__details">
-      ${stateIsOffers ? offersTemplate : ''}
-      ${stateIsDescription ? eventDescriptionTemplate : ''}
+      ${offersTemplate}
+      ${eventDescriptionTemplate}
     </section>
   </form>`;
 };

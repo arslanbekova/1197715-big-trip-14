@@ -69,18 +69,22 @@ const createEventDestinationTemplate = (destinations) => {
   ).join('');
 };
 
-const createEventDescriptionTemplate = (destination) => {
-  return `<section class="event__section  event__section--destination">
-    <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-    <p class="event__destination-description">${destination.description}</p>
+const createEventDescriptionTemplate = (destination, isDescription) => {
+  if (isDescription) {
+    return `<section class="event__section  event__section--destination">
+      <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+      <p class="event__destination-description">${destination.description}</p>
 
-    <div class="event__photos-container">
-      <div class="event__photos-tape">
-      ${destination.pictures.map((picture) =>
+      <div class="event__photos-container">
+        <div class="event__photos-tape">
+        ${destination.pictures.map((picture) =>
     `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join('')}
+        </div>
       </div>
-    </div>
-  </section>`;
+    </section>`;
+  } else {
+    return '';
+  }
 };
 
 export const createNewRoutePointTemplate = (newRoutePoint) => {
@@ -139,7 +143,7 @@ export const createNewRoutePointTemplate = (newRoutePoint) => {
     </header>
     <section class="event__details">
       ${offersTemplate}
-      ${stateIsDescription ? eventDescriptionTemplate : ''}
+      ${eventDescriptionTemplate}
     </section>
   </form>`;
 };
