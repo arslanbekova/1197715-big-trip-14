@@ -5,7 +5,6 @@ import {restructuredDestinations} from '../mock/destinations';
 import {restructuredOffers} from '../mock/offers';
 import {ROUTE_POINT_TYPES} from '../utils/const';
 import {toUpperCaseFirstSymbol, removeArrayElement} from '../utils/general';
-import {remove} from '../utils/render';
 
 const DEFAULT_EVENT_TYPE = 'flight';
 const INITIAL_STATE = {
@@ -154,7 +153,6 @@ export default class NewRoutePoint extends Smart {
 
     this._cancelButtonClickHandler = this._cancelButtonClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
-    this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
     this._addExtraOption = this._addExtraOption.bind(this);
@@ -166,25 +164,24 @@ export default class NewRoutePoint extends Smart {
     return createNewRoutePointTemplate(this._state);
   }
 
-  _escKeyDownHandler(evt) {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
-      this._closeNewRoutePointForm();
-    }
+  _cancelButtonClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.cancelButtonClick();
   }
 
-  _closeNewRoutePointForm() {
-    remove(NewRoutePoint);
-    document.removeEventListener('keydown', this._escKeyDownHandler);
-  }
-
-  _cancelButtonClickHandler() {
-    this._closeNewRoutePointForm();
+  setCancelButtonClickHandler(callback) {
+    this._callback.cancelButtonClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._cancelButtonClickHandler);
   }
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    NewRoutePoint.parseStateToData(this._state);
+    this._callback.formSubmit(NewRoutePoint.parseStateToData(this._state));
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().addEventListener('submit', this._formSubmitHandler);
   }
 
   _eventTypeChangeHandler(evt) {
@@ -253,6 +250,8 @@ export default class NewRoutePoint extends Smart {
 
   restoreHandlers() {
     this._setInnerHandlers();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setCancelButtonClickHandler(this._callback.cancelButtonClick);
   }
 
   _setInnerHandlers() {
@@ -269,16 +268,6 @@ export default class NewRoutePoint extends Smart {
         .querySelectorAll('.event__offer-checkbox')
         .forEach((element) => element.addEventListener('change', this._addExtraOption));
     }
-
-    this.getElement()
-      .querySelector('.event__reset-btn')
-      .addEventListener('click', this._cancelButtonClickHandler);
-
-    document.addEventListener('keydown', this._escKeyDownHandler);
-
-    this.getElement()
-      .querySelector('.event__save-btn')
-      .addEventListener('click', this._formSubmitHandler);
   }
 
   //данные в состояние
