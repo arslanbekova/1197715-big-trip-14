@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import Abstract from './abstract';
+import {restructuredOffers} from '../mock/offers';
 
 const calculateDurationTime = (startTime, endTime) => {
   dayjs.extend(duration);
@@ -29,8 +30,9 @@ const calculateDurationTime = (startTime, endTime) => {
   return formattedEventDuration;
 };
 
-const createOfferTemplate = (offers) => {
-  return offers.map((offer) =>
+const createOfferTemplate = (eventType) => {
+  const avaliableOffers = restructuredOffers[eventType];
+  return avaliableOffers.map((offer) =>
     `<li class="event__offer">
       <span class="event__offer-title">${offer.title}</span> &plus;&euro;&nbsp;
       <span class="event__offer-price">${offer.price}</span>
@@ -39,9 +41,9 @@ const createOfferTemplate = (offers) => {
 };
 
 const createRoutePointTemplate = (routePoint) => {
-  const {dateFrom, dateTo, type, destination, basePrice, offers, isFavorite} = routePoint;
+  const {dateFrom, dateTo, type, destination, basePrice, isFavorite} = routePoint;
 
-  const offersTemplate = createOfferTemplate(offers);
+  const offersTemplate = createOfferTemplate(type);
   const favoriteClassName = isFavorite ? 'event__favorite-btn--active' : '';
   const eventDuration = calculateDurationTime(dateFrom, dateTo);
   const eventTitle = type + ' ' + destination.name;

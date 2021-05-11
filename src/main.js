@@ -29,6 +29,3 @@ const tripEventsContainer = siteMainElement.querySelector('.trip-events');
 const tripPresenter = new TripPresenter(tripEventsContainer, tripInfoContainer);
 tripPresenter.init(routePoints);
 
-// Добавляет форму создания
-//render(mainTripEventsList, new NewRoutePoint());
-
