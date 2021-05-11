@@ -6,7 +6,7 @@ import {ROUTE_POINT_TYPES} from '../utils/const';
 import {toUpperCaseFirstSymbol, removeArrayElement} from '../utils/general';
 import Smart from './smart';
 
-const createOfferTemplate = (eventType, isOffers) => {
+const createOfferTemplate = (eventType, isOffers, choosedOffers) => {
   if (isOffers) {
     const avaliableOffers = restructuredOffers[eventType];
     return `<section class="event__section  event__section--offers">
@@ -19,6 +19,7 @@ const createOfferTemplate = (eventType, isOffers) => {
           data-offer-price="${offer.price}"
           id="event-offer-${eventType}-${index+1}"
           type="checkbox"
+          ${choosedOffers.some((choosedOffer) => choosedOffer.title === offer.title) ? 'checked' : ''}
           name="event-offer-${eventType}">
         <label class="event__offer-label" for="event-offer-${eventType}-${index+1}">
           <span class="event__offer-title">${offer.title}</span>
@@ -69,8 +70,8 @@ const createEventDescriptionTemplate = (destination, isDescriptioin) => {
 };
 
 const createEditRoutePointTemplate = (routePoint) => {
-  const {dateFrom, dateTo, type, destination, basePrice, stateIsDescription, stateIsOffers} = routePoint;
-  const offersTemplate = createOfferTemplate(type, stateIsOffers);
+  const {dateFrom, dateTo, type, destination, basePrice, offers, stateIsDescription, stateIsOffers} = routePoint;
+  const offersTemplate = createOfferTemplate(type, stateIsOffers, offers);
   const eventTypesTemplate = createEventTypeTemplate(ROUTE_POINT_TYPES);
   const eventDestinationsTemplate = createEventDestinationTemplate(restructuredDestinations);
   const eventDescriptionTemplate = createEventDescriptionTemplate(destination, stateIsDescription);
