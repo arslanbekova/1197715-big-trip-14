@@ -25,6 +25,7 @@ export default class Trip {
     this._costInfoComponent = new CostInfo();
     this._sortComponent = new SortOptions();
     this._noRoutePointsComponent = new NoRoutePoints();
+    this._newRoutePointComponent = null;
 
     this._handleAddToFavorites = this._handleAddToFavorites.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
@@ -90,6 +91,7 @@ export default class Trip {
 
   _closeNewRoutePointForm() {
     remove(this._newRoutePointComponent);
+    this._newRoutePointComponent = null;
     document.removeEventListener('keydown', this._escKeyDownHandler);
     this._newEventButton.removeAttribute('disabled');
   }
