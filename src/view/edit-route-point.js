@@ -1,10 +1,12 @@
-import dayjs from 'dayjs';
-import _ from 'lodash';
+import Smart from './smart';
 import {restructuredDestinations} from '../mock/destinations';
 import {restructuredOffers} from '../mock/offers';
 import {ROUTE_POINT_TYPES} from '../utils/const';
 import {toUpperCaseFirstSymbol, removeArrayElement} from '../utils/general';
-import Smart from './smart';
+import dayjs from 'dayjs';
+import _ from 'lodash';
+import flatpickr from 'flatpickr';
+import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const createOfferTemplate = (eventType, isOffers, choosedOffers) => {
   if (isOffers) {
@@ -256,7 +258,6 @@ export default class EditRoutePoint extends Smart {
     }
   }
 
-  //данные в состояние
   static parseDataToState(routePoint) {
     const eventType = routePoint.type;
     const avaliableOffers = restructuredOffers[eventType];
@@ -270,7 +271,6 @@ export default class EditRoutePoint extends Smart {
     );
   }
 
-  //состояние в данные
   static parseStateToData(state) {
     state = Object.assign({}, state);
 

@@ -1,6 +1,8 @@
 import Smart from './smart';
 import dayjs from 'dayjs';
 import _ from 'lodash';
+import flatpickr from 'flatpickr';
+import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import {restructuredDestinations} from '../mock/destinations';
 import {restructuredOffers} from '../mock/offers';
 import {ROUTE_POINT_TYPES} from '../utils/const';
@@ -271,7 +273,6 @@ export default class NewRoutePoint extends Smart {
     }
   }
 
-  //данные в состояние
   static parseDataToState(newRoutePoint) {
     const eventType = newRoutePoint.type;
     const avaliableOffers = restructuredOffers[eventType];
