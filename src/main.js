@@ -1,5 +1,5 @@
-// import NewRoutePoint from './view/new-route-point';
 import TripPresenter from './presenter/trip-presenter';
+import RoutePoints from './model/route-points';
 import SiteMenu from './view/site-menu';
 import FilterOptions from './view/filter-options';
 import {generateRoutePoint} from './mock/route-point';
@@ -11,6 +11,9 @@ const routePoints = Array(EVENTS_COUNT)
   .fill('route point')
   .map(generateRoutePoint)
   .sort((a, b) => dayjs(a.dateFrom).diff(dayjs(b.dateFrom)));
+
+const routePointsModel = new RoutePoints();
+routePointsModel.setRoutePoints(routePoints);
 
 const siteHeaderElement = document.querySelector('.page-header');
 const tripInfoContainer = siteHeaderElement.querySelector('.trip-main');
@@ -26,6 +29,6 @@ render(filterOptionsContainer, new FilterOptions());
 const siteMainElement = document.querySelector('.page-main');
 const tripEventsContainer = siteMainElement.querySelector('.trip-events');
 
-const tripPresenter = new TripPresenter(tripEventsContainer, tripInfoContainer);
+const tripPresenter = new TripPresenter(tripEventsContainer, tripInfoContainer, routePointsModel);
 tripPresenter.init(routePoints);
 

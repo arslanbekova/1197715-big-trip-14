@@ -10,9 +10,10 @@ import {RenderPosition, SortOption} from '../utils/const';
 import dayjs from 'dayjs';
 
 export default class Trip {
-  constructor(tripEventsContainer, tripInfoContainer) {
+  constructor(tripEventsContainer, tripInfoContainer, routePointsModel) {
     this._tripEventsContainer = tripEventsContainer;
     this._tripInfoContainer = tripInfoContainer;
+    this._routePointsModel = routePointsModel;
     this._tripEventsList = document.createElement('ul');
     this._tripEventsList.classList.add('trip-events__list');
     this._tripEventsContainer.appendChild(this._tripEventsList);
@@ -41,6 +42,10 @@ export default class Trip {
     this._sourcedRoutePoints = routePoints.slice();
     this._renderTrip();
     this._setNewEventButtonClickHandler();
+  }
+
+  _getRoutePoints() {
+    return this._routePointsModel.getRoutePoints();
   }
 
   _clearRoutePoints() {
