@@ -75,6 +75,7 @@ export default class Trip {
   _newEventFormOpenHandler() {
     this._newRoutePointComponent = new NewRoutePoint();
     render(this._tripEventsList, this._newRoutePointComponent, RenderPosition.AFTERBEGIN);
+    this._newRoutePointComponent.setDatepickers();
     this._newEventButton.setAttribute('disabled', 'disabled');
     this._newRoutePointComponent.setFormSubmitHandler(this._handleNewRoutePointSubmit);
     this._newRoutePointComponent.setCancelButtonClickHandler(this._handleNewRoutePointCancelClick);
@@ -90,6 +91,7 @@ export default class Trip {
   }
 
   _closeNewRoutePointForm() {
+    this._newRoutePointComponent.removeDatepickers();
     remove(this._newRoutePointComponent);
     this._newRoutePointComponent = null;
     document.removeEventListener('keydown', this._escKeyDownHandler);

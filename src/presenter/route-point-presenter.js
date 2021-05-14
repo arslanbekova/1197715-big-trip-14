@@ -68,12 +68,14 @@ export default class RoutePointPresenter {
 
   _openEditRoutePointForm() {
     replace(this._editRoutePointComponent, this._routePointComponent);
+    this._editRoutePointComponent.setDatepickers();
     document.addEventListener('keydown', this._escKeyDownHandler);
     this._changeMode();
     this._mode = Mode.EDITING;
   }
 
   _closeEditRoutePointForm() {
+    this._editRoutePointComponent.removeDatepickers();
     this._editRoutePointComponent.resetState(this._routePoint);
     replace(this._routePointComponent, this._editRoutePointComponent);
     document.removeEventListener('keydown', this._escKeyDownHandler);

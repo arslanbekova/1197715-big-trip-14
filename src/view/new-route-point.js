@@ -165,7 +165,6 @@ export default class NewRoutePoint extends Smart {
     this._dateToChangeHandler = this._dateToChangeHandler.bind(this);
 
     this._setInnerHandlers();
-    this._setDatepickers();
   }
 
   getTemplate() {
@@ -270,19 +269,20 @@ export default class NewRoutePoint extends Smart {
 
   restoreHandlers() {
     this._setInnerHandlers();
-    this._setDatepickers();
+    this.setDatepickers();
+    this.removeDatepickers();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setCancelButtonClickHandler(this._callback.cancelButtonClick);
   }
 
-  _setDatepickers() {
-    if (this._dateFromPicker || this._dateToPicker) {
-      this._dateFromPicker.destroy();
-      this._dateToPicker.destroy();
-      this._dateFromPicker = null;
-      this._dateToPicker = null;
-    }
+  removeDatepickers() {
+    this._dateFromPicker.destroy();
+    this._dateToPicker.destroy();
+    this._dateFromPicker = null;
+    this._dateToPicker = null;
+  }
 
+  setDatepickers() {
     this._dateFromPicker = flatpickr(this.getElement().querySelector('#event-start-time-1'), {
       enableTime: true,
       dateFormat: 'd/m/y H:i',
