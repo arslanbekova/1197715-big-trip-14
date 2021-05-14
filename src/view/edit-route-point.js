@@ -1,10 +1,12 @@
-import dayjs from 'dayjs';
-import _ from 'lodash';
+import Smart from './smart';
 import {restructuredDestinations} from '../mock/destinations';
 import {restructuredOffers} from '../mock/offers';
 import {ROUTE_POINT_TYPES} from '../utils/const';
 import {toUpperCaseFirstSymbol, removeArrayElement} from '../utils/general';
-import Smart from './smart';
+import dayjs from 'dayjs';
+import _ from 'lodash';
+import flatpickr from 'flatpickr';
+import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const createOfferTemplate = (eventType, isOffers, choosedOffers) => {
   if (isOffers) {
@@ -137,14 +139,19 @@ export default class EditRoutePoint extends Smart {
     super();
     this._state = EditRoutePoint.parseDataToState(routePoint);
     this._currentEventType = this._state.type;
+    this._dateFromPicker = null;
+    this._dateToPicker = null;
 
     this._arrowClickHandler = this._arrowClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
     this._addExtraOption = this._addExtraOption.bind(this);
+    this._dateFromChangeHandler = this._dateFromChangeHandler.bind(this);
+    this._dateToChangeHandler = this._dateToChangeHandler.bind(this);
 
     this._setInnerHandlers();
+    this._setDatepickers();
   }
 
   getTemplate() {
@@ -204,6 +211,18 @@ export default class EditRoutePoint extends Smart {
     });
   }
 
+  _dateFromChangeHandler([userDate]) {
+    this.updateState({
+      dateFrom: userDate,
+    }, true);
+  }
+
+  _dateToChangeHandler([userDate]) {
+    this.updateState({
+      dateTo: userDate,
+    }, true);
+  }
+
   _removeEqualOption(choosedOffer, choosedOffers) {
     const equalOffer = choosedOffers.find((element) => _.isEqual(element, choosedOffer));
     removeArrayElement(equalOffer, choosedOffers);
@@ -238,6 +257,38 @@ export default class EditRoutePoint extends Smart {
     this._setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setArrowClickHandler(this._callback.arrowClick);
+    this._setDatepickers();
+  }
+
+  _setDatepickers() {
+    if (this._dateFromPicker || this._dateToPicker) {
+      this._dateFromPicker.destroy();
+      this._dateToPicker.destroy();
+      this._dateFromPicker = null;
+      this._dateToPicker = null;
+    }
+
+    this._dateFromPicker = flatpickr(this.getElement().querySelector('#event-start-time-1'), {
+      enableTime: true,
+      dateFormat: 'd/m/y H:i',
+      time_24hr: true,
+      defaultDate: new Date(this._state.dateFrom),
+      onChange: this._dateFromChangeHandler,
+    });
+
+    const minHours = new Date(this._state.dateFrom).getHours();
+    const minMinutes = new Date(this._state.dateFrom).getMinutes();
+    const minTime = minHours + ':' + minMinutes;
+
+    this._dateToPicker = flatpickr(this.getElement().querySelector('#event-end-time-1'), {
+      enableTime: true,
+      dateFormat: 'd/m/y H:i',
+      time_24hr: true,
+      defaultDate: new Date(this._state.dateTo),
+      minDate: this._state.dateFrom,
+      minTime,
+      onChange: this._dateToChangeHandler,
+    });
   }
 
   _setInnerHandlers() {
@@ -256,7 +307,6 @@ export default class EditRoutePoint extends Smart {
     }
   }
 
-  //данные в состояние
   static parseDataToState(routePoint) {
     const eventType = routePoint.type;
     const avaliableOffers = restructuredOffers[eventType];
@@ -270,7 +320,6 @@ export default class EditRoutePoint extends Smart {
     );
   }
 
-  //состояние в данные
   static parseStateToData(state) {
     state = Object.assign({}, state);
 
