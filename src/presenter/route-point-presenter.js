@@ -1,6 +1,7 @@
 import RoutePoint from '../view/route-point';
 import EditRoutePoint from '../view/edit-route-point';
 import {render, replace, remove} from '../utils/render';
+import {UserAction, UpdateType} from '../utils/const';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -8,9 +9,9 @@ const Mode = {
 };
 
 export default class RoutePointPresenter {
-  constructor(eventsList, addToFavorites, changeMode) {
+  constructor(eventsList, changeData, changeMode) {
     this._eventsList = eventsList;
-    this._addToFavorites = addToFavorites;
+    this._changeData = changeData;
     this._changeMode = changeMode;
 
     this._routePointComponent = null;
@@ -97,12 +98,19 @@ export default class RoutePointPresenter {
     this._closeEditRoutePointForm();
   }
 
-  _handleEditFormSubmit() {
+  _handleEditFormSubmit(routePoint) {
+    this._changeData(
+      UserAction.UPDATE_ROUTE_POINT,
+      UpdateType.MINOR,
+      routePoint,
+    );
     this._closeEditRoutePointForm();
   }
 
   _handleFavoriteClick() {
-    this._addToFavorites(
+    this._changeData(
+      UserAction.UPDATE_ROUTE_POINT,
+      UpdateType.PATCH,
       Object.assign(
         {},
         this._routePoint,
