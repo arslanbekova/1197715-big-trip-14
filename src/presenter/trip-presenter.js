@@ -37,14 +37,28 @@ export default class Trip {
     this._handleNewRoutePointCancelClick = this._handleNewRoutePointCancelClick.bind(this);
   }
 
-  init(routePoints) {
-    this._routePoints = routePoints.slice();
-    this._sourcedRoutePoints = routePoints.slice();
+  init() {
     this._renderTrip();
     this._setNewEventButtonClickHandler();
   }
 
   _getRoutePoints() {
+    switch (this._currentSortType) {
+      case SortOption.TO_SHORTEST_TIME.value:
+        this._routePointsModel.getRoutePoints().slice().sort((a, b) => {
+          const aDuration = dayjs.duration(dayjs(a.dateTo).diff(dayjs(a.dateFrom))).asMilliseconds();
+          const bDuration = dayjs.duration(dayjs(b.dateTo).diff(dayjs(b.dateFrom))).asMilliseconds();
+          return bDuration - aDuration;
+        });
+        break;
+      case SortOption.TO_LOWEST_PRICE.value:
+        this._routePointsModel.getRoutePoints().slice().sort((a, b) => b.basePrice - a.basePrice);
+        break;
+      case SortOption.DEFAULT.value:
+        this._routePointsModel.getRoutePoints().slice().sort((a, b) => dayjs(a.dateFrom).diff(dayjs(b.dateFrom)));
+        break;
+    }
+
     return this._routePointsModel.getRoutePoints();
   }
 
@@ -53,24 +67,6 @@ export default class Trip {
       .values(this._routePointPresenter)
       .forEach((presenter) => presenter.destroy());
     this._routePointPresenter = {};
-  }
-
-  _sortRoutePoints(sortType) {
-    switch (sortType) {
-      case SortOption.TO_SHORTEST_TIME.value:
-        this._routePoints.sort((a, b) => {
-          const aDuration = dayjs.duration(dayjs(a.dateTo).diff(dayjs(a.dateFrom))).asMilliseconds();
-          const bDuration = dayjs.duration(dayjs(b.dateTo).diff(dayjs(b.dateFrom))).asMilliseconds();
-          return bDuration - aDuration;
-        });
-        break;
-      case SortOption.TO_LOWEST_PRICE.value:
-        this._routePoints.sort((a, b) => b.basePrice - a.basePrice );
-        break;
-      default:
-        this._routePoints = this._sourcedRoutePoints.slice();
-    }
-    this._currentSortType = sortType;
   }
 
   _setNewEventButtonClickHandler() {
@@ -114,7 +110,7 @@ export default class Trip {
     if (this._currentSortType === sortType) {
       return;
     }
-    this._sortRoutePoints(sortType);
+    this._currentSortType = sortType;
     this._clearRoutePoints();
     this._renderRoutePoints();
   }
@@ -151,8 +147,8 @@ export default class Trip {
     this._routePointPresenter[routePoint.id] = routePointPresenter;
   }
 
-  _renderRoutePoints() {
-    this._routePoints.forEach((routePoint) => {
+  _renderRoutePoints(routePoints) {
+    routePoints.forEach((routePoint) => {
       this._renderRoutePoint(routePoint, this._tripEventsList);
     });
   }
@@ -162,13 +158,14 @@ export default class Trip {
   }
 
   _renderTrip() {
-    if (!this._routePoints.length) {
+    const routePoints = this._getRoutePoints();
+    if (!routePoints.length) {
       this._renderNoRoutePoints();
       return;
     }
     this._renderTripInfo();
     this._renderCostInfo();
     this._renderSort();
-    this._renderRoutePoints();
+    this._renderRoutePoints(routePoints);
   }
 }
