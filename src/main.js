@@ -1,5 +1,6 @@
 import TripPresenter from './presenter/trip-presenter';
 import RoutePoints from './model/route-points';
+import Filter from './model/filter';
 import SiteMenu from './view/site-menu';
 import FilterOptions from './view/filter-options';
 import {generateRoutePoint} from './mock/route-point';
@@ -12,6 +13,8 @@ const routePoints = Array(EVENTS_COUNT)
 
 const routePointsModel = new RoutePoints();
 routePointsModel.setRoutePoints(routePoints);
+
+const filterModel = new Filter();
 
 const siteHeaderElement = document.querySelector('.page-header');
 const tripInfoContainer = siteHeaderElement.querySelector('.trip-main');

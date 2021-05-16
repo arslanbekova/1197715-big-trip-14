@@ -71,3 +71,9 @@ export const UpdateType = {
   MAJOR: 'MAJOR',
 };
 
+export const FilterOption = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PAST: 'past',
+};
+
