@@ -72,7 +72,6 @@ export default class Trip {
     this._clearRoutePoints();
 
     remove(this._sortComponent);
-    remove(this._noRoutePointsComponent);
     remove(this._tripInfoComponent);
     remove(this._costInfoComponent);
 
@@ -155,12 +154,19 @@ export default class Trip {
         // обновить конкретную точку маршрута
         this._routePointPresenter[data.id].init(data);
         break;
-      case UpdateType.MINOR:
+      case UpdateType.MINOR: {
         // обновить список точек маршрута
+        const routePoints = this._getRoutePoints();
+        if (!routePoints.length) {
+          this._clearTrip();
+          this._renderNoRoutePoints();
+          return;
+        }
         this._clearRoutePoints();
-        this._renderRoutePoints();
+        this._renderRoutePoints(routePoints);
         break;
-        //обновить весь маршрут
+      }
+      //обновить весь маршрут
       case UpdateType.MAJOR:
         this._clearTrip(true);
         this._renderTrip();
@@ -199,7 +205,7 @@ export default class Trip {
   }
 
   _renderNoRoutePoints() {
-    render(this._tripEventsContainer, this._noRoutePointsComponent());
+    render(this._tripEventsContainer, this._noRoutePointsComponent);
   }
 
   _renderTrip() {

@@ -22,6 +22,7 @@ export default class RoutePointPresenter {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleEditFormArrowClick = this._handleEditFormArrowClick.bind(this);
     this._handleEditFormSubmit = this._handleEditFormSubmit.bind(this);
+    this._handleDeleteClick = this._handleDeleteClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
@@ -38,6 +39,7 @@ export default class RoutePointPresenter {
     this._routePointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._editRoutePointComponent.setArrowClickHandler(this._handleEditFormArrowClick);
     this._editRoutePointComponent.setFormSubmitHandler(this._handleEditFormSubmit);
+    this._editRoutePointComponent.setDeleteClickHandler(this._handleDeleteClick);
 
     if (prevRoutePointComponent === null || prevEditRoutePointComponent === null) {
       render(this._eventsList, this._routePointComponent);
@@ -105,6 +107,14 @@ export default class RoutePointPresenter {
       routePoint,
     );
     this._closeEditRoutePointForm();
+  }
+
+  _handleDeleteClick(routePoint) {
+    this._changeData(
+      UserAction.DELETE_ROUTE_POINT,
+      UpdateType.MINOR,
+      routePoint,
+    );
   }
 
   _handleFavoriteClick() {

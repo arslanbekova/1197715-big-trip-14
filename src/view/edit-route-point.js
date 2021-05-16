@@ -149,8 +149,20 @@ export default class EditRoutePoint extends Smart {
     this._addExtraOption = this._addExtraOption.bind(this);
     this._dateFromChangeHandler = this._dateFromChangeHandler.bind(this);
     this._dateToChangeHandler = this._dateToChangeHandler.bind(this);
+    this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
 
     this._setInnerHandlers();
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this._dateFromPicker || this._dateToPicker) {
+      this._dateFromPicker.destroy();
+      this._dateToPicker.destroy();
+      this._dateFromPicker = null;
+      this._dateToPicker = null;
+    }
   }
 
   getTemplate() {
@@ -175,6 +187,16 @@ export default class EditRoutePoint extends Smart {
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().addEventListener('submit', this._formSubmitHandler);
+  }
+
+  _formDeleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(EditRoutePoint.parseStateToData(this._state));
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteClickHandler);
   }
 
   _eventTypeChangeHandler(evt) {
@@ -258,7 +280,7 @@ export default class EditRoutePoint extends Smart {
     this.setArrowClickHandler(this._callback.arrowClick);
     this.setDatepickers();
     this.removeDatepickers();
-
+    this.setDeleteClickHandler(this._callback.deleteClick);
   }
 
   removeDatepickers() {
