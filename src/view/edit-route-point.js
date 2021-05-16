@@ -146,6 +146,7 @@ export default class EditRoutePoint extends Smart {
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
+    this._basePriceChangeHandler = this._basePriceChangeHandler.bind(this);
     this._addExtraOption = this._addExtraOption.bind(this);
     this._dateFromChangeHandler = this._dateFromChangeHandler.bind(this);
     this._dateToChangeHandler = this._dateToChangeHandler.bind(this);
@@ -244,6 +245,13 @@ export default class EditRoutePoint extends Smart {
     }, true);
   }
 
+  _basePriceChangeHandler(evt) {
+    const basePrice = evt.target.value;
+    this.updateState({
+      basePrice,
+    }, true);
+  }
+
   _removeEqualOption(choosedOffer, choosedOffers) {
     const equalOffer = choosedOffers.find((element) => _.isEqual(element, choosedOffer));
     removeArrayElement(equalOffer, choosedOffers);
@@ -284,8 +292,12 @@ export default class EditRoutePoint extends Smart {
   }
 
   removeDatepickers() {
-    this._dateFromPicker.destroy();
-    this._dateToPicker.destroy();
+    if (this._dateFromPicker) {
+      this._dateFromPicker.destroy();
+    }
+    if (this._dateToPicker) {
+      this._dateToPicker.destroy();
+    }
     this._dateFromPicker = null;
     this._dateToPicker = null;
   }
@@ -328,6 +340,10 @@ export default class EditRoutePoint extends Smart {
         .querySelectorAll('.event__offer-checkbox')
         .forEach((element) => element.addEventListener('change', this._addExtraOption));
     }
+
+    this.getElement()
+      .querySelector('.event__input--price')
+      .addEventListener('change', this._basePriceChangeHandler);
   }
 
   static parseDataToState(routePoint) {
