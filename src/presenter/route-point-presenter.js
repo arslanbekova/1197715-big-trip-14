@@ -2,6 +2,7 @@ import RoutePoint from '../view/route-point';
 import EditRoutePoint from '../view/edit-route-point';
 import {render, replace, remove} from '../utils/render';
 import {UserAction, UpdateType} from '../utils/const';
+import dayjs from 'dayjs';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -100,11 +101,20 @@ export default class RoutePointPresenter {
     this._closeEditRoutePointForm();
   }
 
-  _handleEditFormSubmit(routePoint) {
+  _handleEditFormSubmit(update) {
+    const isDatesEqual = (dateA, dateB) => {
+      return dayjs(dateA).isSame(dateB);
+    };
+
+    const isMinorUpdate =
+      !isDatesEqual(this._routePoint.dateFrom, update.dateFrom) ||
+      !isDatesEqual(this._routePoint.dateTo, update.dateTo) ||
+      this._routePoint.basePrice !== update.basePrice;
+
     this._changeData(
       UserAction.UPDATE_ROUTE_POINT,
-      UpdateType.MINOR,
-      routePoint,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      update,
     );
     this._closeEditRoutePointForm();
   }
