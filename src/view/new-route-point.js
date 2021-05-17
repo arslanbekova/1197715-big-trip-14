@@ -160,6 +160,7 @@ export default class NewRoutePoint extends Smart {
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
+    this._basePriceChangeHandler = this._basePriceChangeHandler.bind(this);
     this._addExtraOption = this._addExtraOption.bind(this);
     this._dateFromChangeHandler = this._dateFromChangeHandler.bind(this);
     this._dateToChangeHandler = this._dateToChangeHandler.bind(this);
@@ -228,12 +229,24 @@ export default class NewRoutePoint extends Smart {
   _dateFromChangeHandler([userDate]) {
     this.updateState({
       dateFrom: userDate,
+      stateIsDateFrom: true,
     }, true);
+
+    this._setDateToPicker();
   }
 
   _dateToChangeHandler([userDate]) {
     this.updateState({
       dateTo: userDate,
+      stateIsDateTo: true,
+    }, true);
+  }
+
+  _basePriceChangeHandler(evt) {
+    const basePrice = evt.target.value;
+    this.updateState({
+      basePrice,
+      stateIsBasePrice: true,
     }, true);
   }
 
@@ -270,7 +283,6 @@ export default class NewRoutePoint extends Smart {
   restoreHandlers() {
     this._setInnerHandlers();
     this.setDatepickers();
-    this.removeDatepickers();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setCancelButtonClickHandler(this._callback.cancelButtonClick);
   }
@@ -282,7 +294,18 @@ export default class NewRoutePoint extends Smart {
     this._dateToPicker = null;
   }
 
-  setDatepickers() {
+  _setDateToPicker() {
+    this._dateToPicker = flatpickr(this.getElement().querySelector('#event-end-time-1'), {
+      enableTime: true,
+      dateFormat: 'd/m/y H:i',
+      time_24hr: true,
+      defaultDate: null,
+      minDate: this._state.dateFrom,
+      onChange: this._dateToChangeHandler,
+    });
+  }
+
+  _setDateFromPicker() {
     this._dateFromPicker = flatpickr(this.getElement().querySelector('#event-start-time-1'), {
       enableTime: true,
       dateFormat: 'd/m/y H:i',
@@ -290,20 +313,14 @@ export default class NewRoutePoint extends Smart {
       defaultDate: null,
       onChange: this._dateFromChangeHandler,
     });
+  }
 
-    const minHours = new Date(this._state.dateFrom).getHours();
-    const minMinutes = new Date(this._state.dateFrom).getMinutes();
-    const minTime = minHours + ':' + minMinutes;
-
-    this._dateToPicker = flatpickr(this.getElement().querySelector('#event-end-time-1'), {
-      enableTime: true,
-      dateFormat: 'd/m/y H:i',
-      time_24hr: true,
-      defaultDate: null,
-      minDate: this._state.dateFrom,
-      minTime,
-      onChange: this._dateToChangeHandler,
-    });
+  setDatepickers() {
+    if (this._dateFromPicker || this._dateToPicker) {
+      this.removeDatepickers();
+    }
+    this._setDateFromPicker();
+    this._setDateToPicker();
   }
 
   _setInnerHandlers() {
@@ -320,6 +337,10 @@ export default class NewRoutePoint extends Smart {
         .querySelectorAll('.event__offer-checkbox')
         .forEach((element) => element.addEventListener('change', this._addExtraOption));
     }
+
+    this.getElement()
+      .querySelector('.event__input--price')
+      .addEventListener('change', this._basePriceChangeHandler);
   }
 
   static parseDataToState(newRoutePoint) {
