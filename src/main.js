@@ -34,3 +34,9 @@ const tripEventsContainer = siteMainElement.querySelector('.trip-events');
 const tripPresenter = new TripPresenter(tripEventsContainer, tripInfoContainer, routePointsModel, filterModel);
 tripPresenter.init();
 
+//Добавляет обработчик для создания новой точки маршрута
+document.querySelector('.trip-main__event-add-btn').addEventListener('click', (evt) => {
+  evt.preventDefault();
+  tripPresenter.createNewRoutePoint();
+});
+
