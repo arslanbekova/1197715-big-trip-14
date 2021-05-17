@@ -155,17 +155,6 @@ export default class EditRoutePoint extends Smart {
     this._setInnerHandlers();
   }
 
-  removeElement() {
-    super.removeElement();
-
-    if (this._dateFromPicker || this._dateToPicker) {
-      this._dateFromPicker.destroy();
-      this._dateToPicker.destroy();
-      this._dateFromPicker = null;
-      this._dateToPicker = null;
-    }
-  }
-
   getTemplate() {
     return createEditRoutePointTemplate(this._state);
   }
@@ -289,18 +278,13 @@ export default class EditRoutePoint extends Smart {
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setArrowClickHandler(this._callback.arrowClick);
     this.setDatepickers();
-    this.removeDatepickers();
     this.setDeleteClickHandler(this._callback.deleteClick);
   }
 
   removeDatepickers() {
-    if (this._dateFromPicker) {
-      this._dateFromPicker.destroy();
-    }
-    if (this._dateToPicker) {
-      this._dateToPicker.destroy();
-    }
+    this._dateFromPicker.destroy();
     this._dateFromPicker = null;
+    this._dateToPicker.destroy();
     this._dateToPicker = null;
   }
 
@@ -326,6 +310,9 @@ export default class EditRoutePoint extends Smart {
   }
 
   setDatepickers() {
+    if (this._dateFromPicker || this._dateToPicker) {
+      this.removeDatepickers();
+    }
     this._setDateFromPicker();
     this._setDateToPicker();
   }
@@ -382,7 +369,7 @@ export default class EditRoutePoint extends Smart {
 
   resetState(routePoint) {
     this.updateState(
-      EditRoutePoint.parseStateToData(routePoint),
+      EditRoutePoint.parseStateToData(routePoint), true,
     );
   }
 }
