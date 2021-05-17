@@ -2,11 +2,11 @@ import NoRoutePoints from '../view/no-route-points';
 import CostInfo from '../view/cost-info';
 import TripInfo from '../view/trip-info';
 import SortOptions from '../view/sort-options';
-import NewRoutePoint from '../view/new-route-point';
 import RoutePointPresenter from './route-point-presenter';
+import NewRoutePointPresenter from './new-route-point-presenter';
 import {render,remove} from '../utils/render';
 import {filter} from '../utils/filter.js';
-import {RenderPosition, SortOption, UpdateType, UserAction} from '../utils/const';
+import {RenderPosition, SortOption, UpdateType, UserAction, FilterOption} from '../utils/const';
 import dayjs from 'dayjs';
 
 export default class Trip {
@@ -18,7 +18,6 @@ export default class Trip {
     this._tripEventsList = document.createElement('ul');
     this._tripEventsList.classList.add('trip-events__list');
     this._tripEventsContainer.appendChild(this._tripEventsList);
-    this._newEventButton = document.querySelector('.trip-main__event-add-btn');
 
     this._routePointPresenter = {};
     this._currentSortType = SortOption.DEFAULT.value;
@@ -33,18 +32,22 @@ export default class Trip {
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
-    this._newEventFormOpenHandler = this._newEventFormOpenHandler.bind(this);
-    this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
-    this._handleNewRoutePointSubmit = this._handleNewRoutePointSubmit.bind(this);
-    this._handleNewRoutePointCancelClick = this._handleNewRoutePointCancelClick.bind(this);
 
     this._routePointsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
+
+    this._newRoutePointPresenter = new NewRoutePointPresenter(this._tripEventsList, this._handleViewAction);
   }
 
   init() {
     this._renderTrip();
-    this._setNewEventButtonClickHandler();
+  }
+
+  createNewRoutePoint() {
+    this._currentSortType = SortOption.DEFAULT.value;
+    this._handleModeChange();
+    this._filterModel.setFilter(UpdateType.MAJOR, FilterOption.EVERYTHING);
+    this._newRoutePointPresenter.init();
   }
 
   _getRoutePoints() {
@@ -75,6 +78,7 @@ export default class Trip {
   }
 
   _clearTrip(resetSortType = false) {
+    this._newRoutePointPresenter.destroy();
     this._clearRoutePoints();
 
     remove(this._sortComponent);
@@ -84,43 +88,6 @@ export default class Trip {
 
     if (resetSortType) {
       this._currentSortType = SortOption.DEFAULT.value;
-    }
-  }
-
-  _setNewEventButtonClickHandler() {
-    this._newEventButton.addEventListener('click', this._newEventFormOpenHandler);
-  }
-
-  _newEventFormOpenHandler() {
-    this._newRoutePointComponent = new NewRoutePoint();
-    render(this._tripEventsList, this._newRoutePointComponent, RenderPosition.AFTERBEGIN);
-    this._newRoutePointComponent.setDatepickers();
-    this._newEventButton.setAttribute('disabled', 'disabled');
-    this._newRoutePointComponent.setFormSubmitHandler(this._handleNewRoutePointSubmit);
-    this._newRoutePointComponent.setCancelButtonClickHandler(this._handleNewRoutePointCancelClick);
-    document.addEventListener('keydown', this._escKeyDownHandler);
-  }
-
-  _handleNewRoutePointSubmit() {
-    this._closeNewRoutePointForm();
-  }
-
-  _handleNewRoutePointCancelClick() {
-    this._closeNewRoutePointForm();
-  }
-
-  _closeNewRoutePointForm() {
-    this._newRoutePointComponent.removeDatepickers();
-    remove(this._newRoutePointComponent);
-    this._newRoutePointComponent = null;
-    document.removeEventListener('keydown', this._escKeyDownHandler);
-    this._newEventButton.removeAttribute('disabled');
-  }
-
-  _escKeyDownHandler(evt) {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
-      this._closeNewRoutePointForm();
     }
   }
 
@@ -139,6 +106,8 @@ export default class Trip {
     Object
       .values(this._routePointPresenter)
       .forEach((presenter) => presenter.resetView());
+
+    this._newRoutePointPresenter.destroy();
   }
 
   _handleViewAction(actionType, updateType, update) {
