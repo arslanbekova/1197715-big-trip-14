@@ -5,14 +5,16 @@ import SortOptions from '../view/sort-options';
 import NewRoutePoint from '../view/new-route-point';
 import RoutePointPresenter from './route-point-presenter';
 import {render,remove} from '../utils/render';
+import {filter} from '../utils/filter.js';
 import {RenderPosition, SortOption, UpdateType, UserAction} from '../utils/const';
 import dayjs from 'dayjs';
 
 export default class Trip {
-  constructor(tripEventsContainer, tripInfoContainer, routePointsModel) {
+  constructor(tripEventsContainer, tripInfoContainer, routePointsModel, filterModel) {
     this._tripEventsContainer = tripEventsContainer;
     this._tripInfoContainer = tripInfoContainer;
     this._routePointsModel = routePointsModel;
+    this._filterModel = filterModel;
     this._tripEventsList = document.createElement('ul');
     this._tripEventsList.classList.add('trip-events__list');
     this._tripEventsContainer.appendChild(this._tripEventsList);
@@ -24,7 +26,7 @@ export default class Trip {
     this._tripInfoComponent = new TripInfo();
     this._costInfoComponent = new CostInfo();
     this._sortComponent = null;
-    this._noRoutePointsComponent = new NoRoutePoints();
+    this._noRoutePointsComponent = null;
     this._newRoutePointComponent = null;
 
     this._handleViewAction = this._handleViewAction.bind(this);
@@ -37,6 +39,7 @@ export default class Trip {
     this._handleNewRoutePointCancelClick = this._handleNewRoutePointCancelClick.bind(this);
 
     this._routePointsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
   }
 
   init() {
@@ -45,20 +48,23 @@ export default class Trip {
   }
 
   _getRoutePoints() {
+    const filterType = this._filterModel.getFilter();
+    const routePoints = this._routePointsModel.getRoutePoints();
+    const filtredRoutePoints = filter[filterType](routePoints);
     switch (this._currentSortType) {
       case SortOption.TO_SHORTEST_TIME.value:
-        return this._routePointsModel.getRoutePoints().slice().sort((a, b) => {
+        return filtredRoutePoints.sort((a, b) => {
           const aDuration = dayjs.duration(dayjs(a.dateTo).diff(dayjs(a.dateFrom))).asMilliseconds();
           const bDuration = dayjs.duration(dayjs(b.dateTo).diff(dayjs(b.dateFrom))).asMilliseconds();
           return bDuration - aDuration;
         });
       case SortOption.TO_LOWEST_PRICE.value:
-        return this._routePointsModel.getRoutePoints().slice().sort((a, b) => b.basePrice - a.basePrice);
+        return filtredRoutePoints.sort((a, b) => b.basePrice - a.basePrice);
       case SortOption.DEFAULT.value:
-        return this._routePointsModel.getRoutePoints().slice().sort((a, b) => dayjs(a.dateFrom).diff(dayjs(b.dateFrom)));
+        return filtredRoutePoints.sort((a, b) => dayjs(a.dateFrom).diff(dayjs(b.dateFrom)));
     }
 
-    return this._routePointsModel.getRoutePoints();
+    return filtredRoutePoints;
   }
 
   _clearRoutePoints() {
@@ -74,6 +80,7 @@ export default class Trip {
     remove(this._sortComponent);
     remove(this._tripInfoComponent);
     remove(this._costInfoComponent);
+    remove(this._noRoutePointsComponent);
 
     if (resetSortType) {
       this._currentSortType = SortOption.DEFAULT.value;
@@ -205,6 +212,7 @@ export default class Trip {
   }
 
   _renderNoRoutePoints() {
+    this._noRoutePointsComponent = new NoRoutePoints();
     render(this._tripEventsContainer, this._noRoutePointsComponent);
   }
 
