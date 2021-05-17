@@ -19,8 +19,24 @@ const createFilterOptionsTemplate = (currentFilterType = FilterOption.EVERYTHING
 };
 
 export default class FilterOptions extends Abstract {
+  constructor(currentFilterType) {
+    super();
+    this._currentFilterType = currentFilterType;
+
+    this._filterTypeChangeHandler = this._filterTypeChangeHandler.bind(this);
+  }
 
   getTemplate() {
-    return createFilterOptionsTemplate();
+    return createFilterOptionsTemplate(this._currentFilterType);
+  }
+
+  _filterTypeChangeHandler(evt) {
+    evt.preventDefault();
+    this._callback.filterTypeChange(evt.target.value);
+  }
+
+  setFilterTypeChangeHandler(callback) {
+    this._callback.filterTypeChange = callback;
+    this.getElement().addEventListener('change', this._filterTypeChangeHandler);
   }
 }
