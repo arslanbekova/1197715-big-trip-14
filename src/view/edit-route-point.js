@@ -237,6 +237,8 @@ export default class EditRoutePoint extends Smart {
     this.updateState({
       dateFrom: userDate,
     }, true);
+
+    this._setDateToPicker();
   }
 
   _dateToChangeHandler([userDate]) {
@@ -302,7 +304,18 @@ export default class EditRoutePoint extends Smart {
     this._dateToPicker = null;
   }
 
-  setDatepickers() {
+  _setDateToPicker() {
+    this._dateToPicker = flatpickr(this.getElement().querySelector('#event-end-time-1'), {
+      enableTime: true,
+      dateFormat: 'd/m/y H:i',
+      time_24hr: true,
+      defaultDate: new Date(this._state.dateTo),
+      minDate: this._state.dateFrom,
+      onChange: this._dateToChangeHandler,
+    });
+  }
+
+  _setDateFromPicker() {
     this._dateFromPicker = flatpickr(this.getElement().querySelector('#event-start-time-1'), {
       enableTime: true,
       dateFormat: 'd/m/y H:i',
@@ -310,20 +323,11 @@ export default class EditRoutePoint extends Smart {
       defaultDate: new Date(this._state.dateFrom),
       onChange: this._dateFromChangeHandler,
     });
+  }
 
-    const minHours = new Date(this._state.dateFrom).getHours();
-    const minMinutes = new Date(this._state.dateFrom).getMinutes();
-    const minTime = minHours + ':' + minMinutes;
-
-    this._dateToPicker = flatpickr(this.getElement().querySelector('#event-end-time-1'), {
-      enableTime: true,
-      dateFormat: 'd/m/y H:i',
-      time_24hr: true,
-      defaultDate: new Date(this._state.dateTo),
-      minDate: this._state.dateFrom,
-      minTime,
-      onChange: this._dateToChangeHandler,
-    });
+  setDatepickers() {
+    this._setDateFromPicker();
+    this._setDateToPicker();
   }
 
   _setInnerHandlers() {
