@@ -208,18 +208,30 @@ export default class EditRoutePoint extends Smart {
   }
 
   _destinationChangeHandler(evt) {
-    const newDestinationName = evt.target.value;
-    const newDestination = restructuredDestinations[newDestinationName];
+    const destinationNameElement = evt.target;
+    const destinationName = destinationNameElement.value;
+    const selectedOption = document.querySelector('option[value="' + destinationName + '"]');
 
-    this.updateState({
-      destination: {
-        name: newDestinationName,
-        description: newDestination.description,
-        pictures: newDestination.pictures,
-
-      },
-      stateIsDescription: Boolean(newDestination.description.length),
-    });
+    if (selectedOption !== null) {
+      const newDestination = restructuredDestinations[destinationName];
+      this.updateState({
+        destination: {
+          name: destinationName,
+          description: newDestination.description,
+          pictures: newDestination.pictures,
+        },
+        stateIsDescription: Boolean(newDestination.description.length),
+      });
+    } else {
+      this.updateState({
+        destination: {
+          name: '',
+          description: '',
+          pictures: [],
+        },
+        stateIsDescription: false,
+      });
+    }
   }
 
   _dateFromChangeHandler([userDate]) {
@@ -322,9 +334,10 @@ export default class EditRoutePoint extends Smart {
       .querySelector('.event__type-group')
       .addEventListener('click', this._eventTypeChangeHandler);
 
-    this.getElement()
-      .querySelector('.event__input--destination')
-      .addEventListener('change', this._destinationChangeHandler);
+    ['change', 'paste'].forEach((evt) =>
+      this.getElement()
+        .querySelector('.event__input--destination').addEventListener(evt, this._destinationChangeHandler, false),
+    );
 
     if (this._state.stateIsOffers) {
       this.getElement()
