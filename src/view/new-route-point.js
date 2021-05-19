@@ -1,5 +1,6 @@
 import Smart from './smart';
 import dayjs from 'dayjs';
+import he from 'he';
 import _ from 'lodash';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
@@ -116,7 +117,7 @@ export const createNewRoutePointTemplate = (newRoutePoint) => {
         <label class="event__label  event__type-output" for="event-destination-1">
           ${type}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${stateIsDestinationName ? destination.name : ''}" list="destination-list-1">
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${stateIsDestinationName ? he.encode(destination.name) : ''}" list="destination-list-1">
         <datalist id="destination-list-1">
           ${eventDestinationsTemplate}
         </datalist>
@@ -135,7 +136,7 @@ export const createNewRoutePointTemplate = (newRoutePoint) => {
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${stateIsBasePrice ? basePrice : ''}">
+        <input class="event__input  event__input--price" id="event-price-1" type="number" min="0" name="event-price" value="${stateIsBasePrice ? basePrice : ''}">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -212,18 +213,32 @@ export default class NewRoutePoint extends Smart {
   }
 
   _destinationChangeHandler(evt) {
-    const newDestinationName = evt.target.value;
-    const newDestination = restructuredDestinations[newDestinationName];
+    const destinationNameElement = evt.target;
+    const destinationName = destinationNameElement.value;
+    const selectedOption = document.querySelector('option[value="' + destinationName + '"]');
 
-    this.updateState({
-      destination: {
-        name: newDestinationName,
-        description: newDestination.description,
-        pictures: newDestination.pictures,
-      },
-      stateIsDescription: Boolean(newDestination.description.length),
-      stateIsDestinationName: true,
-    });
+    if (selectedOption !== null) {
+      const newDestination = restructuredDestinations[destinationName];
+      this.updateState({
+        destination: {
+          name: destinationName,
+          description: newDestination.description,
+          pictures: newDestination.pictures,
+        },
+        stateIsDescription: Boolean(newDestination.description.length),
+        stateIsDestinationName: true,
+      });
+    } else {
+      this.updateState({
+        destination: {
+          name: '',
+          description: '',
+          pictures: [],
+        },
+        stateIsDescription: false,
+        stateIsDestinationName: false,
+      });
+    }
   }
 
   _dateFromChangeHandler([userDate]) {
@@ -331,6 +346,11 @@ export default class NewRoutePoint extends Smart {
     this.getElement()
       .querySelector('.event__input--destination')
       .addEventListener('change', this._destinationChangeHandler);
+
+    ['change', 'paste'].forEach((evt) =>
+      this.getElement()
+        .querySelector('.event__input--destination').addEventListener(evt, this._destinationChangeHandler, false),
+    );
 
     if (this._state.stateIsOffers) {
       this.getElement()
