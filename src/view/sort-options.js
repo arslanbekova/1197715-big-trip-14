@@ -1,7 +1,7 @@
 import Abstract from './abstract';
 import {SortOption} from '../utils/const';
 
-const createSortOptionsTemplate = () => {
+const createSortOptionsTemplate = (currentSortType) => {
   return `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
   ${Object.values(SortOption).map((sortType) =>
     `<div class="trip-sort__item  trip-sort__item--${sortType.value}">
@@ -10,7 +10,7 @@ const createSortOptionsTemplate = () => {
         type="radio"
         name="trip-sort"
         value="sort-${sortType.value}"
-        ${sortType.isChecked ? 'checked' : ''}
+        ${currentSortType === sortType.value ? 'checked' : ''}
         ${sortType.isDisabled ? 'disabled' : ''}>
       <label class="trip-sort__btn"
         data-sort-type="${sortType.value}"
@@ -21,14 +21,16 @@ const createSortOptionsTemplate = () => {
 };
 
 export default class SortOptions extends Abstract {
-  constructor() {
+  constructor(currentSortType) {
     super();
+
+    this._currentSortType = currentSortType;
 
     this._sortTypeChangeHandler = this._sortTypeChangeHandler.bind(this);
   }
 
   getTemplate() {
-    return createSortOptionsTemplate();
+    return createSortOptionsTemplate(this._currentSortType);
   }
 
   _sortTypeChangeHandler(evt) {
