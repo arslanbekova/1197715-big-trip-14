@@ -1,6 +1,8 @@
 import RoutePoint from '../view/route-point';
 import EditRoutePoint from '../view/edit-route-point';
 import {render, replace, remove} from '../utils/render';
+import {UserAction, UpdateType} from '../utils/const';
+import dayjs from 'dayjs';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -8,9 +10,9 @@ const Mode = {
 };
 
 export default class RoutePointPresenter {
-  constructor(eventsList, addToFavorites, changeMode) {
+  constructor(eventsList, changeData, changeMode) {
     this._eventsList = eventsList;
-    this._addToFavorites = addToFavorites;
+    this._changeData = changeData;
     this._changeMode = changeMode;
 
     this._routePointComponent = null;
@@ -21,6 +23,7 @@ export default class RoutePointPresenter {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleEditFormArrowClick = this._handleEditFormArrowClick.bind(this);
     this._handleEditFormSubmit = this._handleEditFormSubmit.bind(this);
+    this._handleDeleteClick = this._handleDeleteClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
@@ -37,6 +40,7 @@ export default class RoutePointPresenter {
     this._routePointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._editRoutePointComponent.setArrowClickHandler(this._handleEditFormArrowClick);
     this._editRoutePointComponent.setFormSubmitHandler(this._handleEditFormSubmit);
+    this._editRoutePointComponent.setDeleteClickHandler(this._handleDeleteClick);
 
     if (prevRoutePointComponent === null || prevEditRoutePointComponent === null) {
       render(this._eventsList, this._routePointComponent);
@@ -68,12 +72,14 @@ export default class RoutePointPresenter {
 
   _openEditRoutePointForm() {
     replace(this._editRoutePointComponent, this._routePointComponent);
+    this._editRoutePointComponent.setDatepickers();
     document.addEventListener('keydown', this._escKeyDownHandler);
     this._changeMode();
     this._mode = Mode.EDITING;
   }
 
   _closeEditRoutePointForm() {
+    this._editRoutePointComponent.removeDatepickers();
     this._editRoutePointComponent.resetState(this._routePoint);
     replace(this._routePointComponent, this._editRoutePointComponent);
     document.removeEventListener('keydown', this._escKeyDownHandler);
@@ -95,12 +101,36 @@ export default class RoutePointPresenter {
     this._closeEditRoutePointForm();
   }
 
-  _handleEditFormSubmit() {
+  _handleEditFormSubmit(update) {
+    const isDatesEqual = (dateA, dateB) => {
+      return dayjs(dateA).isSame(dateB);
+    };
+
+    const isMinorUpdate =
+      !isDatesEqual(this._routePoint.dateFrom, update.dateFrom) ||
+      !isDatesEqual(this._routePoint.dateTo, update.dateTo) ||
+      this._routePoint.basePrice !== update.basePrice;
+
+    this._changeData(
+      UserAction.UPDATE_ROUTE_POINT,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      update,
+    );
     this._closeEditRoutePointForm();
   }
 
+  _handleDeleteClick(routePoint) {
+    this._changeData(
+      UserAction.DELETE_ROUTE_POINT,
+      UpdateType.MINOR,
+      routePoint,
+    );
+  }
+
   _handleFavoriteClick() {
-    this._addToFavorites(
+    this._changeData(
+      UserAction.UPDATE_ROUTE_POINT,
+      UpdateType.PATCH,
       Object.assign(
         {},
         this._routePoint,

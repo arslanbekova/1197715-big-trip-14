@@ -1,16 +1,20 @@
-// import NewRoutePoint from './view/new-route-point';
 import TripPresenter from './presenter/trip-presenter';
+import FilterPresenter from './presenter/filter';
+import RoutePoints from './model/route-points';
+import Filter from './model/filter';
 import SiteMenu from './view/site-menu';
-import FilterOptions from './view/filter-options';
 import {generateRoutePoint} from './mock/route-point';
 import {render} from './utils/render';
-import dayjs from 'dayjs';
 
 const EVENTS_COUNT = 20;
 const routePoints = Array(EVENTS_COUNT)
   .fill('route point')
-  .map(generateRoutePoint)
-  .sort((a, b) => dayjs(a.dateFrom).diff(dayjs(b.dateFrom)));
+  .map(generateRoutePoint);
+
+const routePointsModel = new RoutePoints();
+routePointsModel.setRoutePoints(routePoints);
+
+const filterModel = new Filter();
 
 const siteHeaderElement = document.querySelector('.page-header');
 const tripInfoContainer = siteHeaderElement.querySelector('.trip-main');
@@ -20,12 +24,19 @@ const navigationContainer = tripInfoContainer.querySelector('.trip-controls__nav
 render(navigationContainer, new SiteMenu());
 
 const filterOptionsContainer = tripInfoContainer.querySelector('.trip-controls__filters');
-render(filterOptionsContainer, new FilterOptions());
+const filterPresenter = new FilterPresenter(filterOptionsContainer, filterModel, routePointsModel);
+filterPresenter.init();
 
 // Добавляет точки маршрута
 const siteMainElement = document.querySelector('.page-main');
 const tripEventsContainer = siteMainElement.querySelector('.trip-events');
 
-const tripPresenter = new TripPresenter(tripEventsContainer, tripInfoContainer);
-tripPresenter.init(routePoints);
+const tripPresenter = new TripPresenter(tripEventsContainer, tripInfoContainer, routePointsModel, filterModel);
+tripPresenter.init();
+
+//Добавляет обработчик для создания новой точки маршрута
+document.querySelector('.trip-main__event-add-btn').addEventListener('click', (evt) => {
+  evt.preventDefault();
+  tripPresenter.createNewRoutePoint();
+});
 

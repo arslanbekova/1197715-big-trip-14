@@ -4,6 +4,7 @@ import {restructuredOffers} from '../mock/offers';
 import {ROUTE_POINT_TYPES} from '../utils/const';
 import {toUpperCaseFirstSymbol, removeArrayElement} from '../utils/general';
 import dayjs from 'dayjs';
+import he from 'he';
 import _ from 'lodash';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
@@ -99,7 +100,7 @@ const createEditRoutePointTemplate = (routePoint) => {
         <label class="event__label  event__type-output" for="event-destination-1">
           ${type}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination.name)}" list="destination-list-1">
         <datalist id="destination-list-1">
           ${eventDestinationsTemplate}
         </datalist>
@@ -118,7 +119,7 @@ const createEditRoutePointTemplate = (routePoint) => {
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+        <input class="event__input  event__input--price" id="event-price-1" type="number" min="0" name="event-price" value="${basePrice}">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -146,12 +147,13 @@ export default class EditRoutePoint extends Smart {
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
+    this._basePriceChangeHandler = this._basePriceChangeHandler.bind(this);
     this._addExtraOption = this._addExtraOption.bind(this);
     this._dateFromChangeHandler = this._dateFromChangeHandler.bind(this);
     this._dateToChangeHandler = this._dateToChangeHandler.bind(this);
+    this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
 
     this._setInnerHandlers();
-    this._setDatepickers();
   }
 
   getTemplate() {
@@ -178,6 +180,16 @@ export default class EditRoutePoint extends Smart {
     this.getElement().addEventListener('submit', this._formSubmitHandler);
   }
 
+  _formDeleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(EditRoutePoint.parseStateToData(this._state));
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteClickHandler);
+  }
+
   _eventTypeChangeHandler(evt) {
     if (evt.target.hasAttribute('data-event-type')) {
       const newEventType = evt.target.dataset.eventType;
@@ -197,29 +209,50 @@ export default class EditRoutePoint extends Smart {
   }
 
   _destinationChangeHandler(evt) {
-    const newDestinationName = evt.target.value;
-    const newDestination = restructuredDestinations[newDestinationName];
+    const destinationNameElement = evt.target;
+    const destinationName = destinationNameElement.value;
+    const selectedOption = document.querySelector('option[value="' + destinationName + '"]');
 
-    this.updateState({
-      destination: {
-        name: newDestinationName,
-        description: newDestination.description,
-        pictures: newDestination.pictures,
-
-      },
-      stateIsDescription: Boolean(newDestination.description.length),
-    });
+    if (selectedOption !== null) {
+      const newDestination = restructuredDestinations[destinationName];
+      this.updateState({
+        destination: {
+          name: destinationName,
+          description: newDestination.description,
+          pictures: newDestination.pictures,
+        },
+        stateIsDescription: Boolean(newDestination.description.length),
+      });
+    } else {
+      this.updateState({
+        destination: {
+          name: '',
+          description: '',
+          pictures: [],
+        },
+        stateIsDescription: false,
+      });
+    }
   }
 
   _dateFromChangeHandler([userDate]) {
     this.updateState({
       dateFrom: userDate,
     }, true);
+
+    this._setDateToPicker();
   }
 
   _dateToChangeHandler([userDate]) {
     this.updateState({
       dateTo: userDate,
+    }, true);
+  }
+
+  _basePriceChangeHandler(evt) {
+    const basePrice = evt.target.value;
+    this.updateState({
+      basePrice,
     }, true);
   }
 
@@ -257,17 +290,29 @@ export default class EditRoutePoint extends Smart {
     this._setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setArrowClickHandler(this._callback.arrowClick);
-    this._setDatepickers();
+    this.setDatepickers();
+    this.setDeleteClickHandler(this._callback.deleteClick);
   }
 
-  _setDatepickers() {
-    if (this._dateFromPicker || this._dateToPicker) {
-      this._dateFromPicker.destroy();
-      this._dateToPicker.destroy();
-      this._dateFromPicker = null;
-      this._dateToPicker = null;
-    }
+  removeDatepickers() {
+    this._dateFromPicker.destroy();
+    this._dateFromPicker = null;
+    this._dateToPicker.destroy();
+    this._dateToPicker = null;
+  }
 
+  _setDateToPicker() {
+    this._dateToPicker = flatpickr(this.getElement().querySelector('#event-end-time-1'), {
+      enableTime: true,
+      dateFormat: 'd/m/y H:i',
+      time_24hr: true,
+      defaultDate: new Date(this._state.dateTo),
+      minDate: this._state.dateFrom,
+      onChange: this._dateToChangeHandler,
+    });
+  }
+
+  _setDateFromPicker() {
     this._dateFromPicker = flatpickr(this.getElement().querySelector('#event-start-time-1'), {
       enableTime: true,
       dateFormat: 'd/m/y H:i',
@@ -275,20 +320,14 @@ export default class EditRoutePoint extends Smart {
       defaultDate: new Date(this._state.dateFrom),
       onChange: this._dateFromChangeHandler,
     });
+  }
 
-    const minHours = new Date(this._state.dateFrom).getHours();
-    const minMinutes = new Date(this._state.dateFrom).getMinutes();
-    const minTime = minHours + ':' + minMinutes;
-
-    this._dateToPicker = flatpickr(this.getElement().querySelector('#event-end-time-1'), {
-      enableTime: true,
-      dateFormat: 'd/m/y H:i',
-      time_24hr: true,
-      defaultDate: new Date(this._state.dateTo),
-      minDate: this._state.dateFrom,
-      minTime,
-      onChange: this._dateToChangeHandler,
-    });
+  setDatepickers() {
+    if (this._dateFromPicker || this._dateToPicker) {
+      this.removeDatepickers();
+    }
+    this._setDateFromPicker();
+    this._setDateToPicker();
   }
 
   _setInnerHandlers() {
@@ -296,15 +335,20 @@ export default class EditRoutePoint extends Smart {
       .querySelector('.event__type-group')
       .addEventListener('click', this._eventTypeChangeHandler);
 
-    this.getElement()
-      .querySelector('.event__input--destination')
-      .addEventListener('change', this._destinationChangeHandler);
+    ['change', 'paste'].forEach((evt) =>
+      this.getElement()
+        .querySelector('.event__input--destination').addEventListener(evt, this._destinationChangeHandler, false),
+    );
 
     if (this._state.stateIsOffers) {
       this.getElement()
         .querySelectorAll('.event__offer-checkbox')
         .forEach((element) => element.addEventListener('change', this._addExtraOption));
     }
+
+    this.getElement()
+      .querySelector('.event__input--price')
+      .addEventListener('change', this._basePriceChangeHandler);
   }
 
   static parseDataToState(routePoint) {
@@ -339,7 +383,7 @@ export default class EditRoutePoint extends Smart {
 
   resetState(routePoint) {
     this.updateState(
-      EditRoutePoint.parseStateToData(routePoint),
+      EditRoutePoint.parseStateToData(routePoint), true,
     );
   }
 }
