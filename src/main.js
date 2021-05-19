@@ -6,6 +6,7 @@ import SiteMenu from './view/site-menu';
 import Statistics from './view/statistics';
 import {generateRoutePoint} from './mock/route-point';
 import {render} from './utils/render';
+import {MenuItem} from './utils/const';
 
 const EVENTS_COUNT = 20;
 const routePoints = Array(EVENTS_COUNT)
@@ -22,7 +23,8 @@ const tripInfoContainer = siteHeaderElement.querySelector('.trip-main');
 
 // Добавляет меню и фильтры
 const navigationContainer = tripInfoContainer.querySelector('.trip-controls__navigation');
-render(navigationContainer, new SiteMenu());
+const siteMenuComponent = new SiteMenu();
+render(navigationContainer, siteMenuComponent);
 
 const filterOptionsContainer = tripInfoContainer.querySelector('.trip-controls__filters');
 const filterPresenter = new FilterPresenter(filterOptionsContainer, filterModel, routePointsModel);
@@ -42,5 +44,25 @@ document.querySelector('.trip-main__event-add-btn').addEventListener('click', (e
 });
 
 //Добавляет статистику
-render(tripEventsContainer, new Statistics());
+const siteMainContainer = siteMainElement.querySelector('.page-body__container');
+const statisticsComponent = new Statistics();
+render(siteMainContainer, statisticsComponent);
 
+//Переключение экранов
+const handleSiteMenuClick = (menuItem) => {
+  const hiddenClassName = 'statistics--hidden';
+  switch (menuItem) {
+    case MenuItem.TABLE:
+      tripPresenter.showTrip();
+      siteMenuComponent.setMenuItem(MenuItem.TABLE);
+      statisticsComponent.hide(hiddenClassName);
+      break;
+    case MenuItem.STATISTICS:
+      tripPresenter.hideTrip();
+      statisticsComponent.show(hiddenClassName);
+      siteMenuComponent.setMenuItem(MenuItem.STATISTICS);
+      break;
+  }
+};
+
+siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);

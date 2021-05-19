@@ -77,3 +77,8 @@ export const FilterOption = {
   PAST: 'past',
 };
 
+export const MenuItem = {
+  TABLE: 'table',
+  STATISTICS: 'stats',
+};
+
