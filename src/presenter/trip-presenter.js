@@ -45,6 +45,7 @@ export default class Trip {
   }
 
   showTrip() {
+    this._handleSortTypeChange(SortOption.DEFAULT.value);
     this._tripEventsContainer.classList.remove(this._hiddenClassName);
   }
 
