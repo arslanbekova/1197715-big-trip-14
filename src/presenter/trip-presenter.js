@@ -21,6 +21,7 @@ export default class Trip {
 
     this._routePointPresenter = {};
     this._currentSortType = SortOption.DEFAULT.value;
+    this._hiddenClassName = 'trip-events--hidden';
 
     this._tripInfoComponent = new TripInfo();
     this._costInfoComponent = new CostInfo();
@@ -41,6 +42,14 @@ export default class Trip {
 
   init() {
     this._renderTrip();
+  }
+
+  showTrip() {
+    this._tripEventsContainer.classList.remove(this._hiddenClassName);
+  }
+
+  hideTrip() {
+    this._tripEventsContainer.classList.add(this._hiddenClassName);
   }
 
   createNewRoutePoint() {

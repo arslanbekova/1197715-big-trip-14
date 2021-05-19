@@ -1,7 +1,7 @@
 import Smart from './smart';
 
 const createStatisticsTemplate = () => {
-  return `<section class="statistics">
+  return `<section class="statistics statistics--hidden">
     <h2 class="visually-hidden">Trip statistics</h2>
 
     <div class="statistics__item statistics__item--money">
