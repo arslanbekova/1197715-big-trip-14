@@ -3,6 +3,7 @@ import FilterPresenter from './presenter/filter';
 import RoutePoints from './model/route-points';
 import Filter from './model/filter';
 import SiteMenu from './view/site-menu';
+import Statistics from './view/statistics';
 import {generateRoutePoint} from './mock/route-point';
 import {render} from './utils/render';
 
@@ -39,4 +40,7 @@ document.querySelector('.trip-main__event-add-btn').addEventListener('click', (e
   evt.preventDefault();
   tripPresenter.createNewRoutePoint();
 });
+
+//Добавляет статистику
+render(tripEventsContainer, new Statistics());
 
