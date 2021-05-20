@@ -9,3 +9,9 @@ export const getCostsByType = (uniqTypes, routePoints) => uniqTypes.reduce((resu
   });
   return result;
 }, []);
+
+export const getTypesByUsageCount = (uniqTypes, routePoints) => uniqTypes.reduce((result, uniqType, index) => {
+  const count = routePoints.filter((routePoint) => routePoint.type === uniqType).length;
+  result[index] = {type: uniqType, count};
+  return result;
+}, []);

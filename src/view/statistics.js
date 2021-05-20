@@ -2,7 +2,7 @@ import Smart from './smart';
 import {makeItemsUniq} from '../utils/general';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {getCostsByType} from '../utils/statistics';
+import {getCostsByType, getTypesByUsageCount} from '../utils/statistics';
 
 const renderMoneyChart = (moneyCtx, routePoints, uniqTypes) => {
   const costsByType = getCostsByType(uniqTypes, routePoints)
@@ -42,6 +42,82 @@ const renderMoneyChart = (moneyCtx, routePoints, uniqTypes) => {
       title: {
         display: true,
         text: 'MONEY',
+        fontColor: '#000000',
+        fontSize: 23,
+        position: 'left',
+      },
+      scales: {
+        yAxes: [{
+          ticks: {
+            fontColor: '#000000',
+            padding: 5,
+            fontSize: 13,
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false,
+          },
+        }],
+        xAxes: [{
+          ticks: {
+            display: false,
+            beginAtZero: true,
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false,
+          },
+        }],
+      },
+      legend: {
+        display: false,
+      },
+      tooltips: {
+        enabled: false,
+      },
+    },
+  });
+};
+
+const renderTypeChart = (typeCtx, routePoints, uniqTypes) => {
+
+  const typesByUsageCount = getTypesByUsageCount(uniqTypes, routePoints)
+    .sort((a, b) => b.count - a.count);
+
+  return new Chart(typeCtx, {
+    plugins: [ChartDataLabels],
+    type: 'horizontalBar',
+    data: {
+      labels: typesByUsageCount.map((type) => type.type.toUpperCase()),
+      datasets: [{
+        data: typesByUsageCount.map((type) => type.count),
+        backgroundColor: '#ffffff',
+        hoverBackgroundColor: '#ffffff',
+        anchor: 'start',
+
+        categoryPercentage: .8,
+        barPercentage: 1,
+
+        minBarThickness: 44,
+        minBarLength: 50,
+      }],
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: {
+        datalabels: {
+          font: {
+            size: 13,
+          },
+          color: '#000000',
+          anchor: 'end',
+          align: 'start',
+          formatter: (val) => `${val}x`,
+        },
+      },
+      title: {
+        display: true,
+        text: 'TYPE',
         fontColor: '#000000',
         fontSize: 23,
         position: 'left',
