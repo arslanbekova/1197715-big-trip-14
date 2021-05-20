@@ -5,7 +5,7 @@ import Filter from './model/filter';
 import SiteMenu from './view/site-menu';
 import Statistics from './view/statistics';
 import {generateRoutePoint} from './mock/route-point';
-import {render} from './utils/render';
+import {render, remove} from './utils/render';
 import {MenuItem} from './utils/const';
 
 const EVENTS_COUNT = 20;
@@ -32,6 +32,7 @@ filterPresenter.init();
 
 // Добавляет точки маршрута
 const siteMainElement = document.querySelector('.page-main');
+const siteMainContainer = siteMainElement.querySelector('.page-body__container');
 const tripEventsContainer = siteMainElement.querySelector('.trip-events');
 
 const tripPresenter = new TripPresenter(tripEventsContainer, tripInfoContainer, routePointsModel, filterModel);
@@ -43,25 +44,24 @@ document.querySelector('.trip-main__event-add-btn').addEventListener('click', (e
   tripPresenter.createNewRoutePoint();
 });
 
-//Добавляет статистику
-const siteMainContainer = siteMainElement.querySelector('.page-body__container');
-const statisticsComponent = new Statistics(routePointsModel.getRoutePoints());
-render(siteMainContainer, statisticsComponent);
-
 //Переключение экранов
+let statisticsComponent = null;
 const handleSiteMenuClick = (menuItem) => {
-  const hiddenClassName = 'statistics--hidden';
   switch (menuItem) {
     case MenuItem.TABLE:
       tripPresenter.showTrip();
       filterPresenter.setActive();
       siteMenuComponent.setMenuItem(MenuItem.TABLE);
-      statisticsComponent.hide(hiddenClassName);
+      if (statisticsComponent !== null) {
+        remove(statisticsComponent);
+        statisticsComponent = null;
+      }
       break;
     case MenuItem.STATISTICS:
       tripPresenter.hideTrip();
       filterPresenter.setDisable();
-      statisticsComponent.show(hiddenClassName);
+      statisticsComponent = new Statistics(routePointsModel.getRoutePoints());
+      render(siteMainContainer, statisticsComponent);
       siteMenuComponent.setMenuItem(MenuItem.STATISTICS);
       break;
   }
