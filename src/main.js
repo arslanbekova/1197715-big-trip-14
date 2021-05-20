@@ -54,11 +54,13 @@ const handleSiteMenuClick = (menuItem) => {
   switch (menuItem) {
     case MenuItem.TABLE:
       tripPresenter.showTrip();
+      filterPresenter.setActive();
       siteMenuComponent.setMenuItem(MenuItem.TABLE);
       statisticsComponent.hide(hiddenClassName);
       break;
     case MenuItem.STATISTICS:
       tripPresenter.hideTrip();
+      filterPresenter.setDisable();
       statisticsComponent.show(hiddenClassName);
       siteMenuComponent.setMenuItem(MenuItem.STATISTICS);
       break;
