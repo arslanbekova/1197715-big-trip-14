@@ -1,34 +1,7 @@
 import dayjs from 'dayjs';
-import duration from 'dayjs/plugin/duration';
 import Abstract from './abstract';
 import {restructuredOffers} from '../mock/offers';
-
-const calculateDurationTime = (startTime, endTime) => {
-  dayjs.extend(duration);
-
-  const DurationBreakpoint = {
-    LESS_HOUR: 1,
-    MORE_DAY: 24,
-  };
-  const eventDuration = dayjs.duration(dayjs(endTime).diff(dayjs(startTime)));
-  let formattedEventDuration;
-
-  switch (true) {
-    case eventDuration.as('hours') < DurationBreakpoint.LESS_HOUR:
-      formattedEventDuration = eventDuration.format('mm[M]');
-      break;
-    case eventDuration.as('hours') > DurationBreakpoint.LESS_HOUR && eventDuration.as('hours') < DurationBreakpoint.MORE_DAY:
-      formattedEventDuration = eventDuration.format('HH[H] mm[M]');
-      break;
-    case eventDuration.as('hours') > DurationBreakpoint.MORE_DAY:
-      formattedEventDuration = eventDuration.format('DD[D] HH[H] mm[M]');
-      break;
-    default:
-      formattedEventDuration = eventDuration.format('HH[H]');
-  }
-
-  return formattedEventDuration;
-};
+import {calculateDurationTime, formatEventDuration} from '../utils/duration-time';
 
 const createOfferTemplate = (eventType) => {
   const avaliableOffers = restructuredOffers[eventType];
@@ -45,7 +18,7 @@ const createRoutePointTemplate = (routePoint) => {
 
   const offersTemplate = createOfferTemplate(type);
   const favoriteClassName = isFavorite ? 'event__favorite-btn--active' : '';
-  const eventDuration = calculateDurationTime(dateFrom, dateTo);
+  const eventDuration = formatEventDuration(calculateDurationTime(dateFrom, dateTo));
   const eventTitle = type + ' ' + destination.name;
 
   return `<li class="trip-events__item">
