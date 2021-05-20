@@ -2,7 +2,11 @@ import Smart from './smart';
 import {makeItemsUniq} from '../utils/general';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {getCostsByType, getTypesByUsageCount} from '../utils/statistics';
+import {getCostsByType, getTypesByUsageCount, getSpendedTimeByType} from '../utils/statistics';
+import {formatEventDuration} from '../utils/duration-time';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+dayjs.extend(duration);
 
 const renderMoneyChart = (moneyCtx, routePoints, uniqTypes) => {
   const costsByType = getCostsByType(uniqTypes, routePoints)
@@ -135,6 +139,84 @@ const renderTypeChart = (typeCtx, routePoints, uniqTypes) => {
           },
         }],
         xAxes: [{
+          ticks: {
+            display: false,
+            beginAtZero: true,
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false,
+          },
+        }],
+      },
+      legend: {
+        display: false,
+      },
+      tooltips: {
+        enabled: false,
+      },
+    },
+  });
+};
+
+const renderTimeChart = (timeCtx, routePoints, uniqTypes) => {
+
+  const spendedTimeByType = getSpendedTimeByType(uniqTypes, routePoints)
+    .sort((a, b) => b.spendedTime.asMilliseconds() - a.spendedTime.asMilliseconds());
+
+  return new Chart(timeCtx, {
+    plugins: [ChartDataLabels],
+    type: 'horizontalBar',
+    data: {
+      labels: spendedTimeByType.map((item) => item.type.toUpperCase()),
+      datasets: [{
+        data: spendedTimeByType.map((item) => item.spendedTime.asMilliseconds()),
+        backgroundColor: '#ffffff',
+        hoverBackgroundColor: '#ffffff',
+        anchor: 'start',
+
+        categoryPercentage: .8,
+        barPercentage: 1,
+
+        minBarThickness: 44,
+        minBarLength: 90,
+      }],
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: {
+        datalabels: {
+          font: {
+            size: 13,
+          },
+          color: '#000000',
+          anchor: 'end',
+          align: 'start',
+          formatter: (val) => `${formatEventDuration(dayjs.duration(val))}`,
+          padding: 5,
+        },
+      },
+      title: {
+        display: true,
+        text: 'TIME-SPEND',
+        fontColor: '#000000',
+        fontSize: 23,
+        position: 'left',
+      },
+      scales: {
+        yAxes: [{
+          ticks: {
+            fontColor: '#000000',
+            fontSize: 13,
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false,
+          },
+        }],
+        xAxes: [{
+          categoryPercentage: .8,
+          barPercentage: 1,
           ticks: {
             display: false,
             beginAtZero: true,
