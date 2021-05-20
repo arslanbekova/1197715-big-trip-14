@@ -1,4 +1,5 @@
 import Smart from './smart';
+import {makeItemsUniq} from '../utils/general';
 
 const createStatisticsTemplate = () => {
   return `<section class="statistics statistics--hidden">
@@ -17,13 +18,43 @@ const createStatisticsTemplate = () => {
     </div>
   </section>`;
 };
-
 export default class Statistics extends Smart {
-  constructor() {
+  constructor(routePoints) {
     super();
+
+    this._routePoints = routePoints;
+    this._moneyChart = null;
+    this._typeChart = null;
+    this._timeChart = null;
+
+    this._setCharts();
   }
 
   getTemplate() {
-    return createStatisticsTemplate(this._data);
+    return createStatisticsTemplate();
+  }
+
+  _setCharts() {
+    if (this._moneyChart !== null || this._typeChart !== null || this._timeChart !== null) {
+      this._moneyChart = null;
+      this._typeChart = null;
+      this._timeChart = null;
+    }
+
+    const moneyCtx = this.getElement().querySelector('.statistics__chart--money');
+    const typeCtx = this.getElement().querySelector('.statistics__chart--transport');
+    const timeCtx = this.getElement().querySelector('.statistics__chart--time');
+
+    const BAR_HEIGHT = 55;
+    moneyCtx.height = BAR_HEIGHT * 5;
+    typeCtx.height = BAR_HEIGHT * 5;
+    timeCtx.height = BAR_HEIGHT * 5;
+
+    const routePointTypes = this._routePoints.map((routePoint) => routePoint.type);
+    const uniqTypes = makeItemsUniq(routePointTypes);
+
+    this._moneyChart = renderMoneyChart(moneyCtx, this._routePoints, uniqTypes);
+    this._typeChart = renderTypeChart(typeCtx, this._routePoints, uniqTypes);
+    this._timeChart = renderTimeChart(timeCtx, this._routePoints, uniqTypes);
   }
 }
