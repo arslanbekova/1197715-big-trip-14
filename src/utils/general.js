@@ -26,3 +26,5 @@ export const removeArrayElement = (element, array) => {
     array.splice(index, 1);
   }
 };
+
+export const makeItemsUniq = (items) => [...new Set(items)];
