@@ -45,7 +45,7 @@ document.querySelector('.trip-main__event-add-btn').addEventListener('click', (e
 
 //Добавляет статистику
 const siteMainContainer = siteMainElement.querySelector('.page-body__container');
-const statisticsComponent = new Statistics();
+const statisticsComponent = new Statistics(routePointsModel.getRoutePoints());
 render(siteMainContainer, statisticsComponent);
 
 //Переключение экранов

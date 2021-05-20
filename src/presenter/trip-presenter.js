@@ -47,10 +47,12 @@ export default class Trip {
   showTrip() {
     this._handleSortTypeChange(SortOption.DEFAULT.value);
     this._tripEventsContainer.classList.remove(this._hiddenClassName);
+    this._newRoutePointPresenter.setActive();
   }
 
   hideTrip() {
     this._tripEventsContainer.classList.add(this._hiddenClassName);
+    this._newRoutePointPresenter.setDisable();
   }
 
   createNewRoutePoint() {
