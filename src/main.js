@@ -19,6 +19,7 @@ routePointsModel.setRoutePoints(routePoints);
 const filterModel = new Filter();
 
 const siteHeaderElement = document.querySelector('.page-header');
+const siteHeaderContainer = siteHeaderElement.querySelector('.page-header__container');
 const tripInfoContainer = siteHeaderElement.querySelector('.trip-main');
 
 // Добавляет меню и фильтры
@@ -56,6 +57,8 @@ const handleSiteMenuClick = (menuItem) => {
         remove(statisticsComponent);
         statisticsComponent = null;
       }
+      siteMainContainer.classList.remove('no-after');
+      siteHeaderContainer.classList.remove('no-after');
       break;
     case MenuItem.STATISTICS:
       tripPresenter.hideTrip();
@@ -63,6 +66,8 @@ const handleSiteMenuClick = (menuItem) => {
       statisticsComponent = new Statistics(routePointsModel.getRoutePoints());
       render(siteMainContainer, statisticsComponent);
       siteMenuComponent.setMenuItem(MenuItem.STATISTICS);
+      siteMainContainer.classList.add('no-after');
+      siteHeaderContainer.classList.add('no-after');
       break;
   }
 };
