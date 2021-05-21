@@ -28,9 +28,17 @@ export default class NewRoutePointPresenter {
     render(this._tripEventsList, this._newRoutePointComponent, RenderPosition.AFTERBEGIN);
     this._newRoutePointComponent.setDatepickers();
 
-    this._newEventButton.setAttribute('disabled', 'disabled');
+    this.setDisable();
 
     document.addEventListener('keydown', this._escKeyDownHandler);
+  }
+
+  setDisable() {
+    this._newEventButton.setAttribute('disabled', 'disabled');
+  }
+
+  setActive() {
+    this._newEventButton.removeAttribute('disabled');
   }
 
   destroy() {
@@ -42,7 +50,7 @@ export default class NewRoutePointPresenter {
     this._newRoutePointComponent = null;
 
     document.removeEventListener('keydown', this._escKeyDownHandler);
-    this._newEventButton.removeAttribute('disabled');
+    this.setActive();
   }
 
   _handleNewRoutePointSubmit(newRoutePoint) {
