@@ -3,6 +3,8 @@ import RoutePointsModel from './model/route-points';
 const Method = {
   GET: 'GET',
   PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE',
 };
 
 const SuccessHTTPStatusRange = {
@@ -38,15 +40,33 @@ export default class Api {
       .then(Api.toJSON);
   }
 
-  updateRoutePoint(RoutePoint) {
+  updateRoutePoint(routePoint) {
     return this._load({
-      url: `${Url.POINTS}/${RoutePoint.id}`,
+      url: `${Url.POINTS}/${routePoint.id}`,
       method: Method.PUT,
-      body: JSON.stringify(RoutePointsModel.adaptToServer(RoutePoint)),
+      body: JSON.stringify(RoutePointsModel.adaptToServer(routePoint)),
       headers: new Headers({'Content-Type': 'application/json'}),
     })
       .then(Api.toJSON)
       .then(RoutePointsModel.adaptToClient);
+  }
+
+  addRoutePoint(routePoint) {
+    return this._load({
+      url: Url.POINTS,
+      method: Method.POST,
+      body: JSON.stringify(RoutePointsModel.adaptToServer(routePoint)),
+      headers: new Headers({'Content-Type': 'application/json'}),
+    })
+      .then(Api.toJSON)
+      .then(RoutePointsModel.adaptToClient);
+  }
+
+  deleteRoutePoint(routePoint) {
+    return this._load({
+      url: `${Url.POINTS}/${routePoint.id}`,
+      method: Method.DELETE,
+    });
   }
 
   _load({

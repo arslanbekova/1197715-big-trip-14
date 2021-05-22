@@ -131,15 +131,22 @@ export default class Trip {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_ROUTE_POINT:
-        this._api.updateRoutePoint(update).then((response) => {
-          this._routePointsModel.updateRoutePoint(updateType, response);
-        });
+        this._api.updateRoutePoint(update)
+          .then((response) => {
+            this._routePointsModel.updateRoutePoint(updateType, response);
+          });
         break;
       case UserAction.ADD_ROUTE_POINT:
-        this._routePointsModel.addRoutePoint(updateType, update);
+        this._api.addRoutePoint(update)
+          .then((response) => {
+            this._routePointsModel.addRoutePoint(updateType, response);
+          });
         break;
       case UserAction.DELETE_ROUTE_POINT:
-        this._routePointsModel.deleteRoutePoint(updateType, update);
+        this._api.deleteRoutePoint(update)
+          .then(() => {
+            this._routePointsModel.deleteRoutePoint(updateType, update);
+          });
         break;
     }
   }
