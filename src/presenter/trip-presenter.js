@@ -164,6 +164,11 @@ export default class Trip {
         this._clearTrip(true);
         this._renderTrip();
         break;
+      case UpdateType.INIT:
+      this._isLoading = false;
+      remove(this._loadingComponent);
+      this._renderTrip();
+      break;
     }
   }
 

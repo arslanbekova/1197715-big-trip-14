@@ -6,8 +6,9 @@ export default class RoutePoints extends Observer {
     this._routePoints = [];
   }
 
-  setRoutePoints(routePoints) {
+  setRoutePoints(updateType, routePoints) {
     this._routePoints = routePoints.slice();
+    this._notify(updateType);
   }
 
   getRoutePoints() {
