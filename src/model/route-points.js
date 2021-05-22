@@ -81,8 +81,8 @@ export default class RoutePoints extends Observer {
       routePoint,
       {
         'base_price': routePoint.basePrice,
-        'date_from': routePoint.dateFrom.toISOString(),
-        'date_to': routePoint.dateTo.toISOString(),
+        'date_from': routePoint.dateFrom,
+        'date_to': routePoint.dateTo,
         'is_favorite': routePoint.isFavorite,
       },
     );

@@ -11,7 +11,7 @@ import {RenderPosition, SortOption, UpdateType, UserAction, FilterOption} from '
 import dayjs from 'dayjs';
 
 export default class Trip {
-  constructor(tripEventsContainer, tripInfoContainer, routePointsModel, filterModel, destinationsModel, offersModel) {
+  constructor(tripEventsContainer, tripInfoContainer, routePointsModel, filterModel, destinationsModel, offersModel, api) {
     this._tripEventsContainer = tripEventsContainer;
     this._tripInfoContainer = tripInfoContainer;
     this._routePointsModel = routePointsModel;
@@ -26,6 +26,7 @@ export default class Trip {
     this._currentSortType = SortOption.DEFAULT.value;
     this._hiddenClassName = 'trip-events--hidden';
     this._isLoading = true;
+    this._api = api;
 
     this._tripInfoComponent = new TripInfo();
     this._costInfoComponent = new CostInfo();
@@ -130,7 +131,9 @@ export default class Trip {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_ROUTE_POINT:
-        this._routePointsModel.updateRoutePoint(updateType, update);
+        this._api.updateRoutePoint(update).then((response) => {
+          this._routePointsModel.updateRoutePoint(updateType, response);
+        });
         break;
       case UserAction.ADD_ROUTE_POINT:
         this._routePointsModel.addRoutePoint(updateType, update);

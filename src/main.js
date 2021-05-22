@@ -37,7 +37,7 @@ const newEventButton = document.querySelector('.trip-main__event-add-btn');
 
 const siteMenuComponent = new SiteMenu();
 const filterPresenter = new FilterPresenter(filterOptionsContainer, filterModel, routePointsModel);
-const tripPresenter = new TripPresenter(tripEventsContainer, tripInfoContainer, routePointsModel, filterModel, destinationsModel, offersModel);
+const tripPresenter = new TripPresenter(tripEventsContainer, tripInfoContainer, routePointsModel, filterModel, destinationsModel, offersModel, api);
 
 //Переключение экранов
 let statisticsComponent = null;

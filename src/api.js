@@ -40,7 +40,7 @@ export default class Api {
 
   updateRoutePoint(RoutePoint) {
     return this._load({
-      url: `points/${RoutePoint.id}`,
+      url: `${Url.POINTS}/${RoutePoint.id}`,
       method: Method.PUT,
       body: JSON.stringify(RoutePointsModel.adaptToServer(RoutePoint)),
       headers: new Headers({'Content-Type': 'application/json'}),
