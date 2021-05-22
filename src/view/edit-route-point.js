@@ -251,7 +251,7 @@ export default class EditRoutePoint extends Smart {
   }
 
   _basePriceChangeHandler(evt) {
-    const basePrice = evt.target.value;
+    const basePrice = Number(evt.target.value);
     this.updateState({
       basePrice,
     }, true);
@@ -270,7 +270,7 @@ export default class EditRoutePoint extends Smart {
     const offerPrice = evt.target.dataset.offerPrice;
     const choosedOffer = {
       title: offerTitle,
-      price: offerPrice,
+      price: Number(offerPrice),
     };
     const choosedOffers = this._state.offers.slice();
     const isEqualOffer = choosedOffers.some((element) => _.isEqual(element, choosedOffer));
@@ -384,7 +384,7 @@ export default class EditRoutePoint extends Smart {
 
   resetState(routePoint) {
     this.updateState(
-      EditRoutePoint.parseStateToData(routePoint), true,
+      EditRoutePoint.parseDataToState(routePoint, this._offersModel),
     );
   }
 }
