@@ -10,10 +10,13 @@ const Mode = {
 };
 
 export default class RoutePointPresenter {
-  constructor(eventsList, changeData, changeMode) {
+  constructor(eventsList, changeData, changeMode, destinationsModel, offersModel) {
     this._eventsList = eventsList;
     this._changeData = changeData;
     this._changeMode = changeMode;
+
+    this._destinationsModel = destinationsModel;
+    this._offersModel = offersModel;
 
     this._routePointComponent = null;
     this._editRoutePointComponent = null;
@@ -34,7 +37,7 @@ export default class RoutePointPresenter {
     const prevEditRoutePointComponent = this._editRoutePointComponent;
 
     this._routePointComponent = new RoutePoint(routePoint);
-    this._editRoutePointComponent = new EditRoutePoint(routePoint);
+    this._editRoutePointComponent = new EditRoutePoint(routePoint, this._destinationsModel, this._offersModel);
 
     this._routePointComponent.setArrowClickHandler(this._handleRoutePointArrowClick);
     this._routePointComponent.setFavoriteClickHandler(this._handleFavoriteClick);

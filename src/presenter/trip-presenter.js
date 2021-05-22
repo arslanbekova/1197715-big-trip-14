@@ -1,4 +1,5 @@
 import NoRoutePoints from '../view/no-route-points';
+import Loading from '../view/loading';
 import CostInfo from '../view/cost-info';
 import TripInfo from '../view/trip-info';
 import SortOptions from '../view/sort-options';
@@ -10,11 +11,13 @@ import {RenderPosition, SortOption, UpdateType, UserAction, FilterOption} from '
 import dayjs from 'dayjs';
 
 export default class Trip {
-  constructor(tripEventsContainer, tripInfoContainer, routePointsModel, filterModel) {
+  constructor(tripEventsContainer, tripInfoContainer, routePointsModel, filterModel, destinationsModel, offersModel) {
     this._tripEventsContainer = tripEventsContainer;
     this._tripInfoContainer = tripInfoContainer;
     this._routePointsModel = routePointsModel;
     this._filterModel = filterModel;
+    this._destinationsModel = destinationsModel;
+    this._offersModel = offersModel;
     this._tripEventsList = document.createElement('ul');
     this._tripEventsList.classList.add('trip-events__list');
     this._tripEventsContainer.appendChild(this._tripEventsList);
@@ -22,9 +25,11 @@ export default class Trip {
     this._routePointPresenter = {};
     this._currentSortType = SortOption.DEFAULT.value;
     this._hiddenClassName = 'trip-events--hidden';
+    this._isLoading = true;
 
     this._tripInfoComponent = new TripInfo();
     this._costInfoComponent = new CostInfo();
+    this._loadingComponent = new Loading();
     this._sortComponent = null;
     this._noRoutePointsComponent = null;
     this._newRoutePointComponent = null;
@@ -37,7 +42,7 @@ export default class Trip {
     this._routePointsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
 
-    this._newRoutePointPresenter = new NewRoutePointPresenter(this._tripEventsList, this._handleViewAction);
+    this._newRoutePointPresenter = new NewRoutePointPresenter(this._tripEventsList, this._handleViewAction, this._destinationsModel, this._offersModel);
   }
 
   init() {
@@ -181,7 +186,7 @@ export default class Trip {
   }
 
   _renderRoutePoint(routePoint, eventsList) {
-    const routePointPresenter = new RoutePointPresenter(eventsList, this._handleViewAction, this._handleModeChange);
+    const routePointPresenter = new RoutePointPresenter(eventsList, this._handleViewAction, this._handleModeChange, this._destinationsModel, this._offersModel);
     routePointPresenter.init(routePoint);
     this._routePointPresenter[routePoint.id] = routePointPresenter;
   }
@@ -192,17 +197,28 @@ export default class Trip {
     });
   }
 
+  _renderLoading() {
+    render(this._tripEventsContainer, this._loadingComponent);
+  }
+
   _renderNoRoutePoints() {
     this._noRoutePointsComponent = new NoRoutePoints();
     render(this._tripEventsContainer, this._noRoutePointsComponent);
   }
 
   _renderTrip() {
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
+
     const routePoints = this._getRoutePoints();
+
     if (!routePoints.length) {
       this._renderNoRoutePoints();
       return;
     }
+
     this._renderTripInfo();
     this._renderCostInfo();
     this._renderSort();
