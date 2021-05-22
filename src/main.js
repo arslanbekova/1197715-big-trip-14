@@ -65,3 +65,40 @@ const handleSiteMenuClick = (menuItem) => {
       break;
   }
 };
+
+const helpInitApp = () => {
+  render(navigationContainer, siteMenuComponent);
+  tripPresenter._newRoutePointPresenter.setActive();
+
+  newEventButton.addEventListener('click', (evt) => {
+    evt.preventDefault();
+    tripPresenter.createNewRoutePoint();
+  });
+
+  siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
+};
+
+Promise.all([api.getOffers(), api.getDestinations()])
+  .then((response) => {
+    const [offers, destinations] = response;
+    destinationsModel.setDestinations(destinations);
+    offersModel.setOffers(offers);
+    filterPresenter.init();
+    tripPresenter.init();
+  })
+  .then(() => {
+    api.getRoutePoints()
+      .then((routePoints) => {
+        routePointsModel.setRoutePoints(UpdateType.INIT, routePoints);
+        helpInitApp();
+      })
+      .catch(() => {
+        //приложение без данных
+        routePointsModel.setRoutePoints(UpdateType.INIT, []);
+        helpInitApp();
+      });
+  })
+  .catch(() => {
+    //блокировка
+    render(tripEventsContainer, new Error());
+  });
