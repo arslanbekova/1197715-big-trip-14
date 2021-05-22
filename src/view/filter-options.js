@@ -1,8 +1,6 @@
 import Abstract from './abstract';
-// import {FilterOption} from '../utils/const.js';
 
 const createFilterOptionsTemplate = (filters, currentFilterType) => {
-  // const {type, name, count} = filter;
   return `<form class="trip-filters" action="#" method="get">
     ${filters.map((filter) =>
     `<div class="trip-filters__filter">
