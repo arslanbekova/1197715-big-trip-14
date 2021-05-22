@@ -4,9 +4,11 @@ import {remove, render} from '../utils/render.js';
 import {UserAction, UpdateType, RenderPosition} from '../utils/const.js';
 
 export default class NewRoutePointPresenter {
-  constructor(tripEventsList, changeData) {
+  constructor(tripEventsList, changeData, destinationsModel, offersModel) {
     this._tripEventsList = tripEventsList;
     this._changeData = changeData;
+    this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
 
     this._newRoutePointComponent = null;
     this._newEventButton = document.querySelector('.trip-main__event-add-btn');
@@ -21,7 +23,7 @@ export default class NewRoutePointPresenter {
       return;
     }
 
-    this._newRoutePointComponent = new NewRoutePoint();
+    this._newRoutePointComponent = new NewRoutePoint(this._destinationsModel, this._offersModel);
     this._newRoutePointComponent.setFormSubmitHandler(this._handleNewRoutePointSubmit);
     this._newRoutePointComponent.setCancelButtonClickHandler(this._handleNewRoutePointCancelClick);
 
