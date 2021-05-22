@@ -1,6 +1,4 @@
 import Smart from './smart';
-import {restructuredDestinations} from '../mock/destinations';
-import {restructuredOffers} from '../mock/offers';
 import {ROUTE_POINT_TYPES} from '../utils/const';
 import {toUpperCaseFirstSymbol, removeArrayElement} from '../utils/general';
 import dayjs from 'dayjs';
@@ -9,9 +7,8 @@ import _ from 'lodash';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
-const createOfferTemplate = (eventType, isOffers, choosedOffers) => {
+const createOfferTemplate = (eventType, isOffers, choosedOffers, avaliableOffers) => {
   if (isOffers) {
-    const avaliableOffers = restructuredOffers[eventType];
     return `<section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
       <div class="event__available-offers">
@@ -48,8 +45,8 @@ const createEventTypeTemplate = (eventTypes) => {
   ).join('');
 };
 
-const createEventDestinationTemplate = (destinations) => {
-  return Object.keys(destinations).map((destination) =>
+const createEventDestinationTemplate = (avaliableDestinations) => {
+  return Object.keys(avaliableDestinations).map((destination) =>
     `<option value="${destination}"></option>`,
   ).join('');
 };
@@ -72,11 +69,13 @@ const createEventDescriptionTemplate = (destination, isDescriptioin) => {
   }
 };
 
-const createEditRoutePointTemplate = (routePoint) => {
+const createEditRoutePointTemplate = (routePoint, destinationsModel, offersModel) => {
   const {dateFrom, dateTo, type, destination, basePrice, offers, stateIsDescription, stateIsOffers} = routePoint;
-  const offersTemplate = createOfferTemplate(type, stateIsOffers, offers);
+  const avaliableOffers = offersModel.getOffers()[type];
+  const avaliableDestinations = destinationsModel.getDestinations();
+  const offersTemplate = createOfferTemplate(type, stateIsOffers, offers, avaliableOffers);
   const eventTypesTemplate = createEventTypeTemplate(ROUTE_POINT_TYPES);
-  const eventDestinationsTemplate = createEventDestinationTemplate(restructuredDestinations);
+  const eventDestinationsTemplate = createEventDestinationTemplate(avaliableDestinations);
   const eventDescriptionTemplate = createEventDescriptionTemplate(destination, stateIsDescription);
 
   return `<form class="event event--edit" action="#" method="post">
@@ -136,10 +135,12 @@ const createEditRoutePointTemplate = (routePoint) => {
 };
 
 export default class EditRoutePoint extends Smart {
-  constructor(routePoint) {
+  constructor(routePoint, destinationsModel, offersModel) {
     super();
-    this._state = EditRoutePoint.parseDataToState(routePoint);
+    this._state = EditRoutePoint.parseDataToState(routePoint, offersModel);
     this._currentEventType = this._state.type;
+    this._destinationsModel = destinationsModel;
+    this._offersModel = offersModel;
     this._dateFromPicker = null;
     this._dateToPicker = null;
 
@@ -157,7 +158,7 @@ export default class EditRoutePoint extends Smart {
   }
 
   getTemplate() {
-    return createEditRoutePointTemplate(this._state);
+    return createEditRoutePointTemplate(this._state, this._destinationsModel, this._offersModel);
   }
 
   _arrowClickHandler(evt) {
@@ -198,7 +199,7 @@ export default class EditRoutePoint extends Smart {
         return;
       }
 
-      const avaliableOffers = restructuredOffers[newEventType];
+      const avaliableOffers = this._offersModel.getOffers()[newEventType];
 
       this.updateState({
         type: newEventType,
@@ -214,7 +215,7 @@ export default class EditRoutePoint extends Smart {
     const selectedOption = document.querySelector('option[value="' + destinationName + '"]');
 
     if (selectedOption !== null) {
-      const newDestination = restructuredDestinations[destinationName];
+      const newDestination = this._destinationsModel.getDestinations()[destinationName];
       this.updateState({
         destination: {
           name: destinationName,
@@ -351,9 +352,9 @@ export default class EditRoutePoint extends Smart {
       .addEventListener('change', this._basePriceChangeHandler);
   }
 
-  static parseDataToState(routePoint) {
+  static parseDataToState(routePoint, offersModel) {
     const eventType = routePoint.type;
-    const avaliableOffers = restructuredOffers[eventType];
+    const avaliableOffers = offersModel.getOffers()[eventType];
     return Object.assign(
       {},
       routePoint,

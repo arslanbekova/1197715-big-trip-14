@@ -6,8 +6,9 @@ export default class RoutePoints extends Observer {
     this._routePoints = [];
   }
 
-  setRoutePoints(routePoints) {
+  setRoutePoints(updateType, routePoints) {
     this._routePoints = routePoints.slice();
+    this._notify(updateType);
   }
 
   getRoutePoints() {
@@ -52,5 +53,45 @@ export default class RoutePoints extends Observer {
     ];
 
     this._notify(updateType);
+  }
+
+  static adaptToClient(routePoint) {
+    const adaptedRoutePoint = Object.assign(
+      {},
+      routePoint,
+      {
+        basePrice: routePoint.base_price,
+        dateFrom: routePoint.date_from,
+        dateTo: routePoint.date_to,
+        isFavorite: routePoint.is_favorite,
+      },
+    );
+
+    delete adaptedRoutePoint.base_price;
+    delete adaptedRoutePoint.date_from;
+    delete adaptedRoutePoint.date_to;
+    delete adaptedRoutePoint.is_favorite;
+
+    return adaptedRoutePoint;
+  }
+
+  static adaptToServer(routePoint) {
+    const adaptedRoutePoint = Object.assign(
+      {},
+      routePoint,
+      {
+        'base_price': routePoint.basePrice,
+        'date_from': routePoint.dateFrom,
+        'date_to': routePoint.dateTo,
+        'is_favorite': routePoint.isFavorite,
+      },
+    );
+
+    delete adaptedRoutePoint.basePrice;
+    delete adaptedRoutePoint.dateFrom;
+    delete adaptedRoutePoint.dateTo;
+    delete adaptedRoutePoint.isFavorite;
+
+    return adaptedRoutePoint;
   }
 }
