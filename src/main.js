@@ -2,48 +2,42 @@ import TripPresenter from './presenter/trip-presenter';
 import FilterPresenter from './presenter/filter';
 import RoutePoints from './model/route-points';
 import Filter from './model/filter';
+import Destinations from './model/destinations';
+import Offers from './model/offers';
 import SiteMenu from './view/site-menu';
 import Statistics from './view/statistics';
-import {generateRoutePoint} from './mock/route-point';
+import Error from './view/error';
 import {render, remove} from './utils/render';
-import {MenuItem} from './utils/const';
+import {MenuItem, UpdateType} from './utils/const';
+import Api from './api.js';
 
-const EVENTS_COUNT = 20;
-const routePoints = Array(EVENTS_COUNT)
-  .fill('route point')
-  .map(generateRoutePoint);
+const AUTHORIZATION = 'Basic R82kiopHJg';
+const END_POINT = 'https://13.ecmascript.pages.academy/big-trip';
+
+const api = new Api(END_POINT, AUTHORIZATION);
 
 const routePointsModel = new RoutePoints();
-routePointsModel.setRoutePoints(routePoints);
-
 const filterModel = new Filter();
+
+const destinationsModel = new Destinations();
+const offersModel = new Offers();
 
 const siteHeaderElement = document.querySelector('.page-header');
 const siteHeaderContainer = siteHeaderElement.querySelector('.page-header__container');
+
 const tripInfoContainer = siteHeaderElement.querySelector('.trip-main');
-
-// Добавляет меню и фильтры
 const navigationContainer = tripInfoContainer.querySelector('.trip-controls__navigation');
-const siteMenuComponent = new SiteMenu();
-render(navigationContainer, siteMenuComponent);
-
 const filterOptionsContainer = tripInfoContainer.querySelector('.trip-controls__filters');
-const filterPresenter = new FilterPresenter(filterOptionsContainer, filterModel, routePointsModel);
-filterPresenter.init();
 
-// Добавляет точки маршрута
 const siteMainElement = document.querySelector('.page-main');
 const siteMainContainer = siteMainElement.querySelector('.page-body__container');
 const tripEventsContainer = siteMainElement.querySelector('.trip-events');
 
-const tripPresenter = new TripPresenter(tripEventsContainer, tripInfoContainer, routePointsModel, filterModel);
-tripPresenter.init();
+const newEventButton = document.querySelector('.trip-main__event-add-btn');
 
-//Добавляет обработчик для создания новой точки маршрута
-document.querySelector('.trip-main__event-add-btn').addEventListener('click', (evt) => {
-  evt.preventDefault();
-  tripPresenter.createNewRoutePoint();
-});
+const siteMenuComponent = new SiteMenu();
+const filterPresenter = new FilterPresenter(filterOptionsContainer, filterModel, routePointsModel);
+const tripPresenter = new TripPresenter(tripEventsContainer, tripInfoContainer, routePointsModel, filterModel, destinationsModel, offersModel);
 
 //Переключение экранов
 let statisticsComponent = null;
@@ -71,5 +65,3 @@ const handleSiteMenuClick = (menuItem) => {
       break;
   }
 };
-
-siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
