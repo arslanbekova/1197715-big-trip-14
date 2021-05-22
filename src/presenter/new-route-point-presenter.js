@@ -1,5 +1,4 @@
 import NewRoutePoint from '../view/new-route-point';
-import {nanoid} from 'nanoid';
 import {remove, render} from '../utils/render.js';
 import {UserAction, UpdateType, RenderPosition} from '../utils/const.js';
 
@@ -59,7 +58,7 @@ export default class NewRoutePointPresenter {
     this._changeData(
       UserAction.ADD_ROUTE_POINT,
       UpdateType.MINOR,
-      Object.assign({id: nanoid()}, newRoutePoint),
+      newRoutePoint,
     );
     this.destroy();
   }
