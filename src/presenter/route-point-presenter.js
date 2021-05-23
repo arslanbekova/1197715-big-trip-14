@@ -9,6 +9,10 @@ const Mode = {
   EDITING: 'EDITING',
 };
 
+export const State = {
+  SAVING: 'SAVING',
+  DELETING: 'DELETING',
+};
 export default class RoutePointPresenter {
   constructor(eventsList, changeData, changeMode, destinationsModel, offersModel) {
     this._eventsList = eventsList;
@@ -55,7 +59,8 @@ export default class RoutePointPresenter {
     }
 
     if (this._mode === Mode.EDITING) {
-      replace(this._editRoutePointComponent, prevEditRoutePointComponent);
+      replace(this._routePointComponent, prevEditRoutePointComponent);
+      this._mode = Mode.DEFAULT;
     }
 
     remove(prevRoutePointComponent);
@@ -70,6 +75,23 @@ export default class RoutePointPresenter {
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
       this._closeEditRoutePointForm();
+    }
+  }
+
+  setViewState(state) {
+    switch (state) {
+      case State.SAVING:
+        this._editRoutePointComponent.updateState({
+          stateIsDisabled: true,
+          stateIsSaving: true,
+        });
+        break;
+      case State.DELETING:
+        this._editRoutePointComponent.updateState({
+          stateIsDisabled: true,
+          stateIsDeleting: true,
+        });
+        break;
     }
   }
 
@@ -119,7 +141,6 @@ export default class RoutePointPresenter {
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       update,
     );
-    this._closeEditRoutePointForm();
   }
 
   _handleDeleteClick(routePoint) {

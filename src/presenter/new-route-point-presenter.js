@@ -54,13 +54,19 @@ export default class NewRoutePointPresenter {
     this.setActive();
   }
 
+  setSaving() {
+    this._editRoutePointComponent.updateState({
+      stateIsDisabled: true,
+      stateIsSaving: true,
+    });
+  }
+
   _handleNewRoutePointSubmit(newRoutePoint) {
     this._changeData(
       UserAction.ADD_ROUTE_POINT,
       UpdateType.MINOR,
       newRoutePoint,
     );
-    this.destroy();
   }
 
   _handleNewRoutePointCancelClick() {
