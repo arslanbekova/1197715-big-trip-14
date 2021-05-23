@@ -17,16 +17,16 @@ const INITIAL_STATE = {
     name: '',
     pictures: [],
   },
-  id: null,
   isFavorite: false,
   offers: [],
   type: DEFAULT_EVENT_TYPE,
 };
 
-const createEventTypeTemplate = (eventTypes) => {
+const createEventTypeTemplate = (eventTypes, stateIsDisabled) => {
   return eventTypes.map((eventType) =>
     `<div class="event__type-item">
-      <input id="event-type-${eventType}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventType}">
+      <input id="event-type-${eventType}-1" class="event__type-input  visually-hidden" type="radio" name="event-type"
+        value="${eventType}" ${stateIsDisabled ? 'disabled' : ''}>
       <label class="event__type-label  event__type-label--${eventType}"
         data-event-type="${eventType}"
         for="event-type-${eventType}-1">${toUpperCaseFirstSymbol(eventType)}</label>
@@ -34,7 +34,7 @@ const createEventTypeTemplate = (eventTypes) => {
   ).join('');
 };
 
-const createOfferTemplate = (eventType, isOffers, choosedOffers, avaliableOffers) => {
+const createOfferTemplate = (eventType, isOffers, choosedOffers, avaliableOffers, stateIsDisabled) => {
   if (isOffers) {
     return `<section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
@@ -46,6 +46,7 @@ const createOfferTemplate = (eventType, isOffers, choosedOffers, avaliableOffers
           data-offer-price="${offer.price}"
           id="event-offer-${eventType}-${index+1}"
           type="checkbox"
+          ${stateIsDisabled ? 'disabled' : ''}
           ${choosedOffers.some((choosedOffer) => choosedOffer.title === offer.title) ? 'checked' : ''}
           name="event-offer-${eventType}">
         <label class="event__offer-label" for="event-offer-${eventType}-${index+1}">
@@ -86,12 +87,26 @@ const createEventDescriptionTemplate = (destination, isDescription) => {
 };
 
 export const createNewRoutePointTemplate = (newRoutePoint, destinationsModel, offersModel) => {
-  const {dateFrom, dateTo, type, destination, basePrice, offers,
-    stateIsDateFrom, stateIsDateTo, stateIsBasePrice, stateIsDestinationName, stateIsDescription, stateIsOffers} = newRoutePoint;
+  const {
+    dateFrom,
+    dateTo,
+    type,
+    destination,
+    basePrice,
+    offers,
+    stateIsDateFrom,
+    stateIsDateTo,
+    stateIsBasePrice,
+    stateIsDestinationName,
+    stateIsDescription,
+    stateIsOffers,
+    stateIsDisabled,
+    stateIsSaving,
+  } = newRoutePoint;
   const avaliableOffers = offersModel.getOffers()[type];
   const avaliableDestinations = destinationsModel.getDestinations();
-  const offersTemplate = createOfferTemplate(type, stateIsOffers, offers, avaliableOffers);
-  const eventTypesTemplate = createEventTypeTemplate(ROUTE_POINT_TYPES);
+  const offersTemplate = createOfferTemplate(type, stateIsOffers, offers, avaliableOffers, stateIsDisabled);
+  const eventTypesTemplate = createEventTypeTemplate(ROUTE_POINT_TYPES, stateIsDisabled);
   const eventDestinationsTemplate = createEventDestinationTemplate(avaliableDestinations);
   const eventDescriptionTemplate = createEventDescriptionTemplate(destination, stateIsDescription);
 
@@ -116,7 +131,9 @@ export const createNewRoutePointTemplate = (newRoutePoint, destinationsModel, of
         <label class="event__label  event__type-output" for="event-destination-1">
           ${type}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${stateIsDestinationName ? he.encode(destination.name) : ''}" list="destination-list-1">
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination"
+          value="${stateIsDestinationName ? he.encode(destination.name) : ''}" list="destination-list-1"
+          ${stateIsDisabled ? 'disabled' : ''}>
         <datalist id="destination-list-1">
           ${eventDestinationsTemplate}
         </datalist>
@@ -124,10 +141,14 @@ export const createNewRoutePointTemplate = (newRoutePoint, destinationsModel, of
 
       <div class="event__field-group  event__field-group--time">
         <label class="visually-hidden" for="event-start-time-1">From</label>
-        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${stateIsDateFrom ? dayjs(dateFrom).format('DD/MM/YY HH:mm') : ''}">
+        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time"
+          value="${stateIsDateFrom ? dayjs(dateFrom).format('DD/MM/YY HH:mm') : ''}"
+          ${stateIsDisabled ? 'disabled' : ''}>
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">To</label>
-        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${stateIsDateTo ? dayjs(dateTo).format('DD/MM/YY HH:mm') : ''}">
+        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time"
+          value="${stateIsDateTo ? dayjs(dateTo).format('DD/MM/YY HH:mm') : ''}"
+          ${stateIsDisabled ? 'disabled' : ''}>
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -135,11 +156,13 @@ export const createNewRoutePointTemplate = (newRoutePoint, destinationsModel, of
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="number" min="0" name="event-price" value="${stateIsBasePrice ? basePrice : ''}">
+        <input class="event__input  event__input--price" id="event-price-1" type="number" min="0" name="event-price"
+          value="${stateIsBasePrice ? basePrice : ''}"
+          ${stateIsDisabled ? 'disabled' : ''}>
       </div>
 
-      <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-      <button class="event__reset-btn" type="reset">Cancel</button>
+      <button class="event__save-btn  btn  btn--blue" ${stateIsDisabled ? 'disabled' : ''} type="submit">${stateIsSaving ? 'Saving...' : 'Save'}</button>
+      <button class="event__reset-btn" ${stateIsDisabled ? 'disabled' : ''} type="reset">Cancel</button>
     </header>
     <section class="event__details">
       ${offersTemplate}
@@ -377,6 +400,8 @@ export default class NewRoutePoint extends Smart {
         stateIsDestinationName: newRoutePoint.destination.name !== '',
         stateIsOffers: Boolean(avaliableOffers.length),
         stateIsDescription: Boolean(newRoutePoint.destination.description.length),
+        stateIsDisabled: false,
+        stateIsSaving: false,
       },
     );
   }
@@ -417,6 +442,8 @@ export default class NewRoutePoint extends Smart {
     delete state.stateIsBasePrice;
     delete state.stateIsOffers;
     delete state.stateIsDescription;
+    delete state.stateIsDisabled;
+    delete state.stateIsSaving;
 
     return state;
   }
