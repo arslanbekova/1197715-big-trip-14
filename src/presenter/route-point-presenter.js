@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 const Mode = {
   DEFAULT: 'DEFAULT',
   EDITING: 'EDITING',
+  ABORTING: 'ABORTING',
 };
 
 export const State = {
@@ -79,6 +80,13 @@ export default class RoutePointPresenter {
   }
 
   setViewState(state) {
+    const resetFormState = () => {
+      this._editRoutePointComponent.updateState({
+        stateIsDisabled: false,
+        stateIsSaving: false,
+        stateIsDeleting: false,
+      });
+    };
     switch (state) {
       case State.SAVING:
         this._editRoutePointComponent.updateState({
@@ -91,6 +99,10 @@ export default class RoutePointPresenter {
           stateIsDisabled: true,
           stateIsDeleting: true,
         });
+        break;
+      case State.ABORTING:
+        this._routePointComponent.shake(resetFormState);
+        this._editRoutePointComponent.shake(resetFormState);
         break;
     }
   }

@@ -135,6 +135,9 @@ export default class Trip {
         this._api.updateRoutePoint(update)
           .then((response) => {
             this._routePointsModel.updateRoutePoint(updateType, response);
+          })
+          .catch(() => {
+            this._routePointPresenter[update.id].setViewState(RoutePointPresenterViewState.ABORTING);
           });
         break;
       case UserAction.ADD_ROUTE_POINT:
@@ -142,6 +145,9 @@ export default class Trip {
         this._api.addRoutePoint(update)
           .then((response) => {
             this._routePointsModel.addRoutePoint(updateType, response);
+          })
+          .catch(() => {
+            this._newRoutePointPresenter.setAborting();
           });
         break;
       case UserAction.DELETE_ROUTE_POINT:
@@ -149,6 +155,9 @@ export default class Trip {
         this._api.deleteRoutePoint(update)
           .then(() => {
             this._routePointsModel.deleteRoutePoint(updateType, update);
+          })
+          .catch(() => {
+            this._routePointPresenter[update.id].setViewState(RoutePointPresenterViewState.ABORTING);
           });
         break;
     }

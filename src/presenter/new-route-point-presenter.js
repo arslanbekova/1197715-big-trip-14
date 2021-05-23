@@ -55,10 +55,22 @@ export default class NewRoutePointPresenter {
   }
 
   setSaving() {
-    this._editRoutePointComponent.updateState({
+    this._newRoutePointComponent.updateState({
       stateIsDisabled: true,
       stateIsSaving: true,
     });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this._newRoutePointComponent.updateState({
+        stateIsDisabled: false,
+        stateIsSaving: false,
+        stateIsDeleting: false,
+      });
+    };
+
+    this._newRoutePointComponent.shake(resetFormState);
   }
 
   _handleNewRoutePointSubmit(newRoutePoint) {

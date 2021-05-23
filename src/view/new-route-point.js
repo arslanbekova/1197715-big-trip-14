@@ -117,7 +117,7 @@ export const createNewRoutePointTemplate = (newRoutePoint, destinationsModel, of
           <span class="visually-hidden">Choose event type</span>
           <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
         </label>
-        <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+        <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${stateIsDisabled ? 'disabled' : ''}>
 
         <div class="event__type-list">
           <fieldset class="event__type-group">
@@ -282,7 +282,7 @@ export default class NewRoutePoint extends Smart {
   }
 
   _basePriceChangeHandler(evt) {
-    const basePrice = evt.target.value;
+    const basePrice = Number(evt.target.value);
     this.updateState({
       basePrice,
       stateIsBasePrice: true,
@@ -299,7 +299,7 @@ export default class NewRoutePoint extends Smart {
 
   _addExtraOption(evt) {
     const offerTitle = evt.target.dataset.offerTitle;
-    const offerPrice = evt.target.dataset.offerPrice;
+    const offerPrice = Number(evt.target.dataset.offerPrice);
     const choosedOffer = {
       title: offerTitle,
       price: offerPrice,
@@ -402,6 +402,7 @@ export default class NewRoutePoint extends Smart {
         stateIsDescription: Boolean(newRoutePoint.destination.description.length),
         stateIsDisabled: false,
         stateIsSaving: false,
+        stateIsDeleting: false,
       },
     );
   }
@@ -444,6 +445,7 @@ export default class NewRoutePoint extends Smart {
     delete state.stateIsDescription;
     delete state.stateIsDisabled;
     delete state.stateIsSaving;
+    delete state.stateIsDeleting;
 
     return state;
   }
