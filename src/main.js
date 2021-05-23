@@ -68,7 +68,7 @@ const handleSiteMenuClick = (menuItem) => {
 
 const helpInitApp = () => {
   render(navigationContainer, siteMenuComponent);
-  tripPresenter._newRoutePointPresenter.setActive();
+  newEventButton.removeAttribute('disabled');
 
   newEventButton.addEventListener('click', (evt) => {
     evt.preventDefault();

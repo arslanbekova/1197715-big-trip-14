@@ -1,5 +1,4 @@
 import NewRoutePoint from '../view/new-route-point';
-import {nanoid} from 'nanoid';
 import {remove, render} from '../utils/render.js';
 import {UserAction, UpdateType, RenderPosition} from '../utils/const.js';
 
@@ -55,13 +54,31 @@ export default class NewRoutePointPresenter {
     this.setActive();
   }
 
+  setSaving() {
+    this._newRoutePointComponent.updateState({
+      stateIsDisabled: true,
+      stateIsSaving: true,
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this._newRoutePointComponent.updateState({
+        stateIsDisabled: false,
+        stateIsSaving: false,
+        stateIsDeleting: false,
+      });
+    };
+
+    this._newRoutePointComponent.shake(resetFormState);
+  }
+
   _handleNewRoutePointSubmit(newRoutePoint) {
     this._changeData(
       UserAction.ADD_ROUTE_POINT,
       UpdateType.MINOR,
-      Object.assign({id: nanoid()}, newRoutePoint),
+      newRoutePoint,
     );
-    this.destroy();
   }
 
   _handleNewRoutePointCancelClick() {

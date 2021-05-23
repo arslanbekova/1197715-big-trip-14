@@ -7,7 +7,7 @@ import _ from 'lodash';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
-const createOfferTemplate = (eventType, isOffers, choosedOffers, avaliableOffers) => {
+const createOfferTemplate = (eventType, isOffers, choosedOffers, avaliableOffers, stateIsDisabled) => {
   if (isOffers) {
     return `<section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
@@ -20,6 +20,7 @@ const createOfferTemplate = (eventType, isOffers, choosedOffers, avaliableOffers
           id="event-offer-${eventType}-${index+1}"
           type="checkbox"
           ${choosedOffers.some((choosedOffer) => choosedOffer.title === offer.title) ? 'checked' : ''}
+          ${stateIsDisabled ? 'disabled' : ''}
           name="event-offer-${eventType}">
         <label class="event__offer-label" for="event-offer-${eventType}-${index+1}">
           <span class="event__offer-title">${offer.title}</span>
@@ -34,10 +35,11 @@ const createOfferTemplate = (eventType, isOffers, choosedOffers, avaliableOffers
   }
 };
 
-const createEventTypeTemplate = (eventTypes) => {
+const createEventTypeTemplate = (eventTypes, stateIsDisabled) => {
   return eventTypes.map((eventType) =>
     `<div class="event__type-item">
-      <input id="event-type-${eventType}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventType}">
+      <input id="event-type-${eventType}-1" class="event__type-input  visually-hidden"
+        type="radio" name="event-type" value="${eventType}" ${stateIsDisabled ? 'disabled' : ''}>
       <label class="event__type-label  event__type-label--${eventType}"
         data-event-type="${eventType}"
         for="event-type-${eventType}-1">${toUpperCaseFirstSymbol(eventType)}</label>
@@ -70,11 +72,23 @@ const createEventDescriptionTemplate = (destination, isDescriptioin) => {
 };
 
 const createEditRoutePointTemplate = (routePoint, destinationsModel, offersModel) => {
-  const {dateFrom, dateTo, type, destination, basePrice, offers, stateIsDescription, stateIsOffers} = routePoint;
+  const {
+    dateFrom,
+    dateTo,
+    type,
+    destination,
+    basePrice,
+    offers,
+    stateIsDescription,
+    stateIsOffers,
+    stateIsDisabled,
+    stateIsSaving,
+    stateIsDeleting,
+  } = routePoint;
   const avaliableOffers = offersModel.getOffers()[type];
   const avaliableDestinations = destinationsModel.getDestinations();
-  const offersTemplate = createOfferTemplate(type, stateIsOffers, offers, avaliableOffers);
-  const eventTypesTemplate = createEventTypeTemplate(ROUTE_POINT_TYPES);
+  const offersTemplate = createOfferTemplate(type, stateIsOffers, offers, avaliableOffers, stateIsDisabled);
+  const eventTypesTemplate = createEventTypeTemplate(ROUTE_POINT_TYPES, stateIsDisabled);
   const eventDestinationsTemplate = createEventDestinationTemplate(avaliableDestinations);
   const eventDescriptionTemplate = createEventDescriptionTemplate(destination, stateIsDescription);
 
@@ -85,7 +99,7 @@ const createEditRoutePointTemplate = (routePoint, destinationsModel, offersModel
           <span class="visually-hidden">Choose event type</span>
           <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
         </label>
-        <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+        <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${stateIsDisabled ? 'disabled' : ''}>
 
         <div class="event__type-list">
           <fieldset class="event__type-group">
@@ -99,7 +113,8 @@ const createEditRoutePointTemplate = (routePoint, destinationsModel, offersModel
         <label class="event__label  event__type-output" for="event-destination-1">
           ${type}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination.name)}" list="destination-list-1">
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination"
+          value="${he.encode(destination.name)}" list="destination-list-1" ${stateIsDisabled ? 'disabled' : ''}>
         <datalist id="destination-list-1">
           ${eventDestinationsTemplate}
         </datalist>
@@ -107,10 +122,12 @@ const createEditRoutePointTemplate = (routePoint, destinationsModel, offersModel
 
       <div class="event__field-group  event__field-group--time">
         <label class="visually-hidden" for="event-start-time-1">From</label>
-        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dayjs(dateFrom).format('DD/MM/YY HH:mm')}">
+        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time"
+          value="${dayjs(dateFrom).format('DD/MM/YY HH:mm')}" ${stateIsDisabled ? 'disabled' : ''}>
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">To</label>
-        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dayjs(dateTo).format('DD/MM/YY HH:mm')}">
+        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time"
+          value="${dayjs(dateTo).format('DD/MM/YY HH:mm')}" ${stateIsDisabled ? 'disabled' : ''}>
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -118,12 +135,15 @@ const createEditRoutePointTemplate = (routePoint, destinationsModel, offersModel
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="number" min="0" name="event-price" value="${basePrice}">
+        <input class="event__input  event__input--price" id="event-price-1" type="number" min="0" name="event-price"
+          value="${basePrice}" ${stateIsDisabled ? 'disabled' : ''}>
       </div>
 
-      <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-      <button class="event__reset-btn" type="reset">Delete</button>
-      <button class="event__rollup-btn" type="button">
+      <button class="event__save-btn  btn  btn--blue" type="submit"
+        ${stateIsDisabled ? 'disabled' : ''}>${stateIsSaving ? 'Saving...' : 'Save'}</button>
+      <button class="event__reset-btn" type="reset"
+        ${stateIsDisabled ? 'disabled' : ''}>${stateIsDeleting ? 'Deleting...' : 'Delete'}</button>
+      <button class="event__rollup-btn" ${stateIsDisabled ? 'disabled' : ''} type="button">
         <span class="visually-hidden">Open event</span>
       </button>
     </header>
@@ -251,7 +271,7 @@ export default class EditRoutePoint extends Smart {
   }
 
   _basePriceChangeHandler(evt) {
-    const basePrice = evt.target.value;
+    const basePrice = Number(evt.target.value);
     this.updateState({
       basePrice,
     }, true);
@@ -270,7 +290,7 @@ export default class EditRoutePoint extends Smart {
     const offerPrice = evt.target.dataset.offerPrice;
     const choosedOffer = {
       title: offerTitle,
-      price: offerPrice,
+      price: Number(offerPrice),
     };
     const choosedOffers = this._state.offers.slice();
     const isEqualOffer = choosedOffers.some((element) => _.isEqual(element, choosedOffer));
@@ -361,6 +381,9 @@ export default class EditRoutePoint extends Smart {
       {
         stateIsOffers: Boolean(avaliableOffers.length),
         stateIsDescription: Boolean(routePoint.destination.description.length),
+        stateIsDisabled: false,
+        stateIsSaving: false,
+        stateIsDeleting: false,
       },
     );
   }
@@ -378,13 +401,16 @@ export default class EditRoutePoint extends Smart {
 
     delete state.stateIsOffers;
     delete state.stateIsDescription;
+    delete state.stateIsDisabled;
+    delete state.stateIsSaving;
+    delete state.stateIsDeleting;
 
     return state;
   }
 
   resetState(routePoint) {
     this.updateState(
-      EditRoutePoint.parseStateToData(routePoint), true,
+      EditRoutePoint.parseDataToState(routePoint, this._offersModel),
     );
   }
 }
