@@ -3,7 +3,7 @@ import Loading from '../view/loading';
 import CostInfo from '../view/cost-info';
 import TripInfo from '../view/trip-info';
 import SortOptions from '../view/sort-options';
-import RoutePointPresenter from './route-point-presenter';
+import RoutePointPresenter, {State as RoutePointPresenterViewState} from './route-point-presenter';
 import NewRoutePointPresenter from './new-route-point-presenter';
 import {render,remove} from '../utils/render';
 import {filter} from '../utils/filter.js';
@@ -131,18 +131,21 @@ export default class Trip {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_ROUTE_POINT:
+        this._routePointPresenter[update.id].setViewState(RoutePointPresenterViewState.SAVING);
         this._api.updateRoutePoint(update)
           .then((response) => {
             this._routePointsModel.updateRoutePoint(updateType, response);
           });
         break;
       case UserAction.ADD_ROUTE_POINT:
+        this._newRoutePointPresenter.setSaving();
         this._api.addRoutePoint(update)
           .then((response) => {
             this._routePointsModel.addRoutePoint(updateType, response);
           });
         break;
       case UserAction.DELETE_ROUTE_POINT:
+        this._routePointPresenter[update.id].setViewState(RoutePointPresenterViewState.DELETING);
         this._api.deleteRoutePoint(update)
           .then(() => {
             this._routePointsModel.deleteRoutePoint(updateType, update);
