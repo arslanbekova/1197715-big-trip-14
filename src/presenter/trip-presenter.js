@@ -28,8 +28,8 @@ export default class Trip {
     this._isLoading = true;
     this._api = api;
 
-    this._tripInfoComponent = new TripInfo();
-    this._costInfoComponent = new CostInfo();
+    this._tripInfoComponent = null;
+    this._costInfoComponent = null;
     this._loadingComponent = new Loading();
     this._sortComponent = null;
     this._noRoutePointsComponent = null;
@@ -179,6 +179,10 @@ export default class Trip {
         }
         this._clearRoutePoints();
         this._renderRoutePoints(routePoints);
+        remove(this._costInfoComponent);
+        remove(this._tripInfoComponent);
+        this._renderTripInfo();
+        this._renderCostInfo(routePoints);
         break;
       }
       //обновить весь маршрут
@@ -195,10 +199,18 @@ export default class Trip {
   }
 
   _renderTripInfo() {
+    if (this._tripInfoComponent !== null) {
+      this._tripInfoComponent = null;
+    }
+    this._tripInfoComponent = new TripInfo(this._routePointsModel);
     render(this._tripInfoContainer, this._tripInfoComponent, RenderPosition.AFTERBEGIN);
   }
 
-  _renderCostInfo() {
+  _renderCostInfo(routePoints) {
+    if (this._costInfoComponent !== null) {
+      this._costInfoComponent = null;
+    }
+    this._costInfoComponent = new CostInfo(routePoints);
     const tripInfoElement = this._tripInfoComponent.getElement();
     render(tripInfoElement, this._costInfoComponent);
   }
@@ -247,7 +259,7 @@ export default class Trip {
     }
 
     this._renderTripInfo();
-    this._renderCostInfo();
+    this._renderCostInfo(routePoints);
     this._renderSort();
     this._renderRoutePoints(routePoints);
   }

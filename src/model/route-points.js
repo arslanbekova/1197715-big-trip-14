@@ -1,4 +1,5 @@
 import Observer from '../utils/observer';
+import dayjs from 'dayjs';
 
 export default class RoutePoints extends Observer {
   constructor() {
@@ -13,6 +14,11 @@ export default class RoutePoints extends Observer {
 
   getRoutePoints() {
     return this._routePoints;
+  }
+
+  getRoutePointsSortedByDefault() {
+    const sourcedRoutePoints = this._routePoints.slice();
+    return sourcedRoutePoints.sort((a, b) => dayjs(a.dateFrom).diff(dayjs(b.dateFrom)));
   }
 
   updateRoutePoint(updateType, update) {
