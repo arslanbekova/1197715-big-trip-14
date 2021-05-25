@@ -155,6 +155,7 @@ export default class RoutePointPresenter {
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       update,
     );
+    this._editRoutePointComponent.removeDatepickers();
   }
 
   _handleDeleteClick(routePoint) {
@@ -163,6 +164,7 @@ export default class RoutePointPresenter {
       UpdateType.MINOR,
       routePoint,
     );
+    this._editRoutePointComponent.removeDatepickers();
   }
 
   _handleFavoriteClick() {
