@@ -146,13 +146,16 @@ export default class RoutePointPresenter {
     const isMinorUpdate =
       !isDatesEqual(this._routePoint.dateFrom, update.dateFrom) ||
       !isDatesEqual(this._routePoint.dateTo, update.dateTo) ||
-      this._routePoint.basePrice !== update.basePrice;
+      this._routePoint.basePrice !== update.basePrice ||
+      this._routePoint.offers.length !== update.offers.length ||
+      this._routePoint.destination.name !== update.destination.name;
 
     this._changeData(
       UserAction.UPDATE_ROUTE_POINT,
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       update,
     );
+    this._editRoutePointComponent.removeDatepickers();
   }
 
   _handleDeleteClick(routePoint) {
@@ -161,6 +164,7 @@ export default class RoutePointPresenter {
       UpdateType.MINOR,
       routePoint,
     );
+    this._editRoutePointComponent.removeDatepickers();
   }
 
   _handleFavoriteClick() {

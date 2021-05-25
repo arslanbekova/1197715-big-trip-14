@@ -76,7 +76,7 @@ export default class NewRoutePointPresenter {
   _handleNewRoutePointSubmit(newRoutePoint) {
     this._changeData(
       UserAction.ADD_ROUTE_POINT,
-      UpdateType.MINOR,
+      UpdateType.MAJOR,
       newRoutePoint,
     );
   }
