@@ -327,7 +327,7 @@ export default class EditRoutePoint extends Smart {
     this._dateToPicker = flatpickr(this.getElement().querySelector('#event-end-time-1'), {
       enableTime: true,
       dateFormat: 'd/m/y H:i',
-      time_24hr: true,
+      'time_24hr': true,
       defaultDate: new Date(this._state.dateTo),
       minDate: this._state.dateFrom,
       onChange: this._dateToChangeHandler,
@@ -338,7 +338,7 @@ export default class EditRoutePoint extends Smart {
     this._dateFromPicker = flatpickr(this.getElement().querySelector('#event-start-time-1'), {
       enableTime: true,
       dateFormat: 'd/m/y H:i',
-      time_24hr: true,
+      'time_24hr': true,
       defaultDate: new Date(this._state.dateFrom),
       onChange: this._dateFromChangeHandler,
     });
