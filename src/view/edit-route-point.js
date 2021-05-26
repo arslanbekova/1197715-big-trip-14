@@ -345,6 +345,9 @@ export default class EditRoutePoint extends Smart {
   }
 
   setDatepickers() {
+    if (this._dateFromPicker || this._dateToPicker) {
+      this.removeDatepickers();
+    }
     this._setDateFromPicker();
     this._setDateToPicker();
   }
@@ -352,7 +355,6 @@ export default class EditRoutePoint extends Smart {
   resetState(routePoint) {
     this.updateState(
       EditRoutePoint.parseDataToState(routePoint, this._offersModel),
-      true,
     );
   }
 
