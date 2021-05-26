@@ -17,9 +17,10 @@ const createCostInfoTemplate = (routePoints) => {
 };
 
 export default class CostInfo extends Abstract {
-  constructor(routePoints) {
+  constructor(routePointsModel) {
     super();
-    this._routePoints = routePoints;
+    this._routePointsModel = routePointsModel;
+    this._routePoints = this._routePointsModel.getRoutePoints();
   }
 
   getTemplate() {
