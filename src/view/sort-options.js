@@ -33,15 +33,15 @@ export default class SortOptions extends Abstract {
     return createSortOptionsTemplate(this._currentSortType);
   }
 
+  setSortTypeChangeHandler(callback) {
+    this._callback.sortTypeChange = callback;
+    this.getElement().addEventListener('click', this._sortTypeChangeHandler);
+  }
+
   _sortTypeChangeHandler(evt) {
     if (evt.target.hasAttribute('data-sort-type')) {
       evt.preventDefault();
       this._callback.sortTypeChange(evt.target.dataset.sortType);
     }
-  }
-
-  setSortTypeChangeHandler(callback) {
-    this._callback.sortTypeChange = callback;
-    this.getElement().addEventListener('click', this._sortTypeChangeHandler);
   }
 }
