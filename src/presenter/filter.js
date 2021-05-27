@@ -56,7 +56,7 @@ export default class Filter {
   }
 
   _getFilters() {
-    const routePoints = this._routePointsModel.getRoutePoints();
+    const routePoints = this._routePointsModel.get();
 
     return [
       {

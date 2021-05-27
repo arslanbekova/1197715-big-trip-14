@@ -34,7 +34,7 @@ export default class TripInfo extends Abstract {
   constructor(routePointsModel) {
     super();
     this._routePointsModel = routePointsModel;
-    this._routePoints = this._routePointsModel.getRoutePointsSortedByDefault().slice();
+    this._routePoints = this._routePointsModel.getSortedByDefault().slice();
   }
 
   getTemplate() {

@@ -57,7 +57,7 @@ const handleSiteMenuClick = (menuItem) => {
     case MenuItem.STATISTICS:
       tripPresenter.hideTrip();
       filterPresenter.setDisable();
-      statisticsComponent = new Statistics(routePointsModel.getRoutePoints());
+      statisticsComponent = new Statistics(routePointsModel.get());
       render(siteMainContainer, statisticsComponent);
       siteMenuComponent.setMenuItem(MenuItem.STATISTICS);
       siteMainContainer.classList.add('no-after');
@@ -89,12 +89,12 @@ Promise.all([api.getOffers(), api.getDestinations()])
   .then(() => {
     api.getRoutePoints()
       .then((routePoints) => {
-        routePointsModel.setRoutePoints(UpdateType.INIT, routePoints);
+        routePointsModel.set(UpdateType.INIT, routePoints);
         helpInitApp();
       })
       .catch(() => {
         //приложение без данных
-        routePointsModel.setRoutePoints(UpdateType.INIT, []);
+        routePointsModel.set(UpdateType.INIT, []);
         helpInitApp();
       });
   })

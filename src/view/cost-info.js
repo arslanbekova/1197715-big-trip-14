@@ -20,7 +20,7 @@ export default class CostInfo extends Abstract {
   constructor(routePointsModel) {
     super();
     this._routePointsModel = routePointsModel;
-    this._routePoints = this._routePointsModel.getRoutePoints();
+    this._routePoints = this._routePointsModel.get();
   }
 
   getTemplate() {
