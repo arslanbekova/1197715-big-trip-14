@@ -104,7 +104,7 @@ export const createNewRoutePointTemplate = (newRoutePoint, destinationsModel, of
     stateIsSaving,
   } = newRoutePoint;
   const avaliableOffers = offersModel.getOffers()[type];
-  const avaliableDestinations = destinationsModel.getDestinations();
+  const avaliableDestinations = destinationsModel.get();
   const offersTemplate = createOfferTemplate(type, stateIsOffers, offers, avaliableOffers, stateIsDisabled);
   const eventTypesTemplate = createEventTypeTemplate(ROUTE_POINT_TYPES, stateIsDisabled);
   const eventDestinationsTemplate = createEventDestinationTemplate(avaliableDestinations);
@@ -242,7 +242,7 @@ export default class NewRoutePoint extends Smart {
     const selectedOption = document.querySelector('option[value="' + destinationName + '"]');
 
     if (selectedOption !== null) {
-      const newDestination = this._destinationsModel.getDestinations()[destinationName];
+      const newDestination = this._destinationsModel.get()[destinationName];
       this.updateState({
         destination: {
           name: destinationName,

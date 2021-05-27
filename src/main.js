@@ -81,7 +81,7 @@ const helpInitApp = () => {
 Promise.all([api.getOffers(), api.getDestinations()])
   .then((response) => {
     const [offers, destinations] = response;
-    destinationsModel.setDestinations(destinations);
+    destinationsModel.set(destinations);
     offersModel.setOffers(offers);
     filterPresenter.init();
     tripPresenter.init();
