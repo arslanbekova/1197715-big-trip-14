@@ -84,6 +84,7 @@ export default class RoutePointPresenter {
     const resetFormState = () => {
       this._editRoutePointComponent.updateState({
         stateIsDisabled: false,
+        stateIsSaveButtonDisabled: false,
         stateIsSaving: false,
         stateIsDeleting: false,
       });
@@ -92,12 +93,14 @@ export default class RoutePointPresenter {
       case State.SAVING:
         this._editRoutePointComponent.updateState({
           stateIsDisabled: true,
+          stateIsSaveButtonDisabled: true,
           stateIsSaving: true,
         });
         break;
       case State.DELETING:
         this._editRoutePointComponent.updateState({
           stateIsDisabled: true,
+          stateIsSaveButtonDisabled: true,
           stateIsDeleting: true,
         });
         break;

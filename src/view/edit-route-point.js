@@ -80,6 +80,7 @@ const createEditRoutePointTemplate = (routePoint, destinationsModel, offersModel
     stateIsDescription,
     stateIsOffers,
     stateIsDisabled,
+    stateIsSaveButtonDisabled,
     stateIsSaving,
     stateIsDeleting,
   } = routePoint;
@@ -112,7 +113,7 @@ const createEditRoutePointTemplate = (routePoint, destinationsModel, offersModel
           ${type}
         </label>
         <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination"
-          value="${he.encode(destination.name)}" list="destination-list-1" ${stateIsDisabled ? 'disabled' : ''}>
+          value="${he.encode(destination.name)}" list="destination-list-1" ${stateIsDisabled ? 'disabled' : ''} required>
         <datalist id="destination-list-1">
           ${eventDestinationsTemplate}
         </datalist>
@@ -121,11 +122,11 @@ const createEditRoutePointTemplate = (routePoint, destinationsModel, offersModel
       <div class="event__field-group  event__field-group--time">
         <label class="visually-hidden" for="event-start-time-1">From</label>
         <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time"
-          value="${dayjs(dateFrom).format('DD/MM/YY HH:mm')}" ${stateIsDisabled ? 'disabled' : ''}>
+          value="${dayjs(dateFrom).format('DD/MM/YY HH:mm')}" ${stateIsDisabled ? 'disabled' : ''} required>
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">To</label>
         <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time"
-          value="${dayjs(dateTo).format('DD/MM/YY HH:mm')}" ${stateIsDisabled ? 'disabled' : ''}>
+          value="${dayjs(dateTo).format('DD/MM/YY HH:mm')}" ${stateIsDisabled ? 'disabled' : ''} required>
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -134,11 +135,11 @@ const createEditRoutePointTemplate = (routePoint, destinationsModel, offersModel
           &euro;
         </label>
         <input class="event__input  event__input--price" id="event-price-1" type="number" min="1" name="event-price"
-          value="${basePrice}" ${stateIsDisabled ? 'disabled' : ''}>
+          value="${basePrice}" ${stateIsDisabled ? 'disabled' : ''} required>
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit"
-        ${stateIsDisabled ? 'disabled' : ''}>${stateIsSaving ? 'Saving...' : 'Save'}</button>
+        ${stateIsSaveButtonDisabled ? 'disabled' : ''}>${stateIsSaving ? 'Saving...' : 'Save'}</button>
       <button class="event__reset-btn" type="reset"
         ${stateIsDisabled ? 'disabled' : ''}>${stateIsDeleting ? 'Deleting...' : 'Delete'}</button>
       <button class="event__rollup-btn" ${stateIsDisabled ? 'disabled' : ''} type="button">
@@ -265,6 +266,21 @@ export default class EditRoutePoint extends Smart {
     });
   }
 
+  _isFormValid() {
+    if (this._state.destination.name !== ''
+      && this._state.dateFrom
+        && this._state.dateTo
+          && this._state.basePrice) {
+      this.updateState({
+        stateIsSaveButtonDisabled: false,
+      });
+      return;
+    }
+    this.updateState({
+      stateIsSaveButtonDisabled: true,
+    });
+  }
+
   _removeEqualOption(choosedOffer, choosedOffers) {
     const equalOffer = choosedOffers.find((element) => _.isEqual(element, choosedOffer));
     removeArrayElement(equalOffer, choosedOffers);
@@ -303,6 +319,7 @@ export default class EditRoutePoint extends Smart {
         offers: [],
         stateIsOffers: Boolean(avaliableOffers.length),
       });
+      this._isFormValid();
     }
   }
 
@@ -331,6 +348,7 @@ export default class EditRoutePoint extends Smart {
         stateIsDescription: false,
       });
     }
+    this._isFormValid();
   }
 
   _dateFromChangeHandler([userDate]) {
@@ -340,12 +358,14 @@ export default class EditRoutePoint extends Smart {
     this._dateToPicker.destroy();
     this._dateToPicker = null;
     this._setDateToPicker();
+    this._isFormValid();
   }
 
   _dateToChangeHandler([userDate]) {
     this.updateState({
       dateTo: userDate,
     }, true);
+    this._isFormValid();
   }
 
   _basePriceChangeHandler(evt) {
@@ -353,6 +373,7 @@ export default class EditRoutePoint extends Smart {
     this.updateState({
       basePrice,
     }, true);
+    this._isFormValid();
   }
 
   _extraOptionChangeHandler(evt) {
@@ -387,6 +408,7 @@ export default class EditRoutePoint extends Smart {
         stateIsOffers: Boolean(avaliableOffers.length),
         stateIsDescription: Boolean(routePoint.destination.description.length),
         stateIsDisabled: false,
+        stateIsSaveButtonDisabled: false,
         stateIsSaving: false,
         stateIsDeleting: false,
       },
@@ -407,6 +429,7 @@ export default class EditRoutePoint extends Smart {
     delete state.stateIsOffers;
     delete state.stateIsDescription;
     delete state.stateIsDisabled;
+    delete state.stateIsSaveButtonDisabled;
     delete state.stateIsSaving;
     delete state.stateIsDeleting;
 

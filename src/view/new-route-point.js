@@ -228,21 +228,6 @@ export default class NewRoutePoint extends Smart {
     this.setCancelButtonClickHandler(this._callback.cancelButtonClick);
   }
 
-  _isFormValid() {
-    if (this._state.destination.name !== ''
-      && this._state.dateFrom
-        && this._state.dateTo
-          && this._state.basePrice) {
-      this.updateState({
-        stateIsSaveButtonDisabled: false,
-      });
-      return;
-    }
-    this.updateState({
-      stateIsSaveButtonDisabled: true,
-    });
-  }
-
   _setInnerHandlers() {
     this.getElement()
       .querySelector('.event__type-group')
@@ -286,6 +271,21 @@ export default class NewRoutePoint extends Smart {
       'time_24hr': true,
       defaultDate: null,
       onChange: this._dateFromChangeHandler,
+    });
+  }
+
+  _isFormValid() {
+    if (this._state.destination.name !== ''
+      && this._state.dateFrom
+        && this._state.dateTo
+          && this._state.basePrice) {
+      this.updateState({
+        stateIsSaveButtonDisabled: false,
+      });
+      return;
+    }
+    this.updateState({
+      stateIsSaveButtonDisabled: true,
     });
   }
 
