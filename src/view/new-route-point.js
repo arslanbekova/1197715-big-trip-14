@@ -99,6 +99,7 @@ export const createNewRoutePointTemplate = (newRoutePoint, destinationsModel, of
     stateIsDescription,
     stateIsOffers,
     stateIsDisabled,
+    stateIsSaveButtonDisabled,
     stateIsSaving,
   } = newRoutePoint;
   const avaliableOffers = offersModel.get()[type];
@@ -131,7 +132,7 @@ export const createNewRoutePointTemplate = (newRoutePoint, destinationsModel, of
         </label>
         <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination"
           value="${stateIsDestinationName ? he.encode(destination.name) : ''}" list="destination-list-1"
-          ${stateIsDisabled ? 'disabled' : ''}>
+          ${stateIsDisabled ? 'disabled' : ''} required>
         <datalist id="destination-list-1">
           ${eventDestinationsTemplate}
         </datalist>
@@ -141,12 +142,12 @@ export const createNewRoutePointTemplate = (newRoutePoint, destinationsModel, of
         <label class="visually-hidden" for="event-start-time-1">From</label>
         <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time"
           value="${stateIsDateFrom ? dayjs(dateFrom).format('DD/MM/YY HH:mm') : ''}"
-          ${stateIsDisabled ? 'disabled' : ''}>
+          ${stateIsDisabled ? 'disabled' : ''} required>
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">To</label>
         <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time"
           value="${stateIsDateTo ? dayjs(dateTo).format('DD/MM/YY HH:mm') : ''}"
-          ${stateIsDisabled ? 'disabled' : ''}>
+          ${stateIsDisabled ? 'disabled' : ''} required>
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -156,10 +157,10 @@ export const createNewRoutePointTemplate = (newRoutePoint, destinationsModel, of
         </label>
         <input class="event__input  event__input--price" id="event-price-1" type="number" min="1" name="event-price"
           value="${stateIsBasePrice ? basePrice : ''}"
-          ${stateIsDisabled ? 'disabled' : ''}>
+          ${stateIsDisabled ? 'disabled' : ''} required>
       </div>
 
-      <button class="event__save-btn  btn  btn--blue" ${stateIsDisabled ? 'disabled' : ''} type="submit">${stateIsSaving ? 'Saving...' : 'Save'}</button>
+      <button class="event__save-btn  btn  btn--blue" ${stateIsSaveButtonDisabled ? 'disabled' : ''} type="submit">${stateIsSaving ? 'Saving...' : 'Save'}</button>
       <button class="event__reset-btn" ${stateIsDisabled ? 'disabled' : ''} type="reset">Cancel</button>
     </header>
     <section class="event__details">
@@ -225,6 +226,21 @@ export default class NewRoutePoint extends Smart {
     this.setDatepickers();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setCancelButtonClickHandler(this._callback.cancelButtonClick);
+  }
+
+  _isFormValid() {
+    if (this._state.destination.name !== ''
+      && this._state.dateFrom
+        && this._state.dateTo
+          && this._state.basePrice) {
+      this.updateState({
+        stateIsSaveButtonDisabled: false,
+      });
+      return;
+    }
+    this.updateState({
+      stateIsSaveButtonDisabled: true,
+    });
   }
 
   _setInnerHandlers() {
@@ -307,6 +323,7 @@ export default class NewRoutePoint extends Smart {
         offers: [],
         stateIsOffers: Boolean(avaliableOffers.length),
       });
+      this._isFormValid();
     }
   }
 
@@ -337,6 +354,7 @@ export default class NewRoutePoint extends Smart {
         stateIsDestinationName: false,
       });
     }
+    this._isFormValid();
   }
 
   _dateFromChangeHandler([userDate]) {
@@ -346,6 +364,7 @@ export default class NewRoutePoint extends Smart {
     }, true);
 
     this._setDateToPicker();
+    this._isFormValid();
   }
 
   _dateToChangeHandler([userDate]) {
@@ -353,14 +372,16 @@ export default class NewRoutePoint extends Smart {
       dateTo: userDate,
       stateIsDateTo: true,
     }, true);
+    this._isFormValid();
   }
 
   _basePriceChangeHandler(evt) {
-    const basePrice = Number(evt.target.value);
+    const basePrice = evt.target.value !== '' ? Number(evt.target.value) : null;
     this.updateState({
       basePrice,
       stateIsBasePrice: true,
     }, true);
+    this._isFormValid();
   }
 
   _extraOptionChangeHandler(evt) {
@@ -399,6 +420,7 @@ export default class NewRoutePoint extends Smart {
         stateIsOffers: Boolean(avaliableOffers.length),
         stateIsDescription: Boolean(newRoutePoint.destination.description.length),
         stateIsDisabled: false,
+        stateIsSaveButtonDisabled: true,
         stateIsSaving: false,
         stateIsDeleting: false,
       },
@@ -442,6 +464,7 @@ export default class NewRoutePoint extends Smart {
     delete state.stateIsOffers;
     delete state.stateIsDescription;
     delete state.stateIsDisabled;
+    delete state.stateIsSaveButtonDisabled;
     delete state.stateIsSaving;
     delete state.stateIsDeleting;
 

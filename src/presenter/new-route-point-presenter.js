@@ -59,6 +59,7 @@ export default class NewRoutePointPresenter {
     this._newRoutePointComponent.updateState({
       stateIsDisabled: true,
       stateIsSaving: true,
+      stateIsSaveButtonDisabled: true,
     });
   }
 
@@ -68,6 +69,7 @@ export default class NewRoutePointPresenter {
         stateIsDisabled: false,
         stateIsSaving: false,
         stateIsDeleting: false,
+        stateIsSaveButtonDisabled: false,
       });
     };
 
