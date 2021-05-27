@@ -1,6 +1,6 @@
 import NewRoutePoint from '../view/new-route-point';
 import {remove, render} from '../utils/render';
-import {UserAction, UpdateType, RenderPosition, isEscKeyDown} from '../utils/const';
+import {UserAction, UpdateType, RenderPosition} from '../utils/const';
 import {isEscEvent} from '../utils/general';
 
 export default class NewRoutePointPresenter {

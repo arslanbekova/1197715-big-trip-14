@@ -8,10 +8,9 @@ const getRoute = (routePoints) => {
     const firstCity = cities.shift();
     const secondCity = cities.pop();
     return `${firstCity} &mdash; ... &mdash; ${secondCity}`;
-  } else {
-    const [firstCity, secondCity, thirdCity] = cities;
-    return `${firstCity} &mdash; ${secondCity} &mdash; ${thirdCity}`;
   }
+  const [firstCity, secondCity, thirdCity] = cities;
+  return `${firstCity} &mdash; ${secondCity} &mdash; ${thirdCity}`;
 };
 
 const getDates = (routePoints) => {

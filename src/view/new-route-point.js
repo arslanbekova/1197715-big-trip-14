@@ -57,9 +57,8 @@ const createOfferTemplate = (eventType, isOffers, choosedOffers, avaliableOffers
       </div>`).join('')}
       </div>
     </section>`;
-  } else {
-    return '';
   }
+  return '';
 };
 
 const createEventDestinationTemplate = (avaliableDestinations) => {
@@ -81,9 +80,8 @@ const createEventDescriptionTemplate = (destination, isDescription) => {
         </div>
       </div>
     </section>`;
-  } else {
-    return '';
   }
+  return '';
 };
 
 export const createNewRoutePointTemplate = (newRoutePoint, destinationsModel, offersModel) => {

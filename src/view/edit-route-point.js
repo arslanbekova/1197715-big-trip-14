@@ -30,9 +30,8 @@ const createOfferTemplate = (eventType, isOffers, choosedOffers, avaliableOffers
       </div>`).join('')}
       </div>
     </section>`;
-  } else {
-    return '';
   }
+  return '';
 };
 
 const createEventTypeTemplate = (eventTypes, stateIsDisabled) => {
@@ -66,9 +65,8 @@ const createEventDescriptionTemplate = (destination, isDescriptioin) => {
         </div>
       </div>
     </section>`;
-  } else {
-    return '';
   }
+  return '';
 };
 
 const createEditRoutePointTemplate = (routePoint, destinationsModel, offersModel) => {
