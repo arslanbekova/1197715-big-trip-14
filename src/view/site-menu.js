@@ -18,16 +18,6 @@ export default class SiteMenu extends Abstract {
     return createSiteMenuTemplate();
   }
 
-  _menuClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.menuClick(evt.target.dataset.menuItem);
-  }
-
-  setMenuClickHandler(callback) {
-    this._callback.menuClick = callback;
-    this.getElement().addEventListener('click', this._menuClickHandler);
-  }
-
   setMenuItem(menuItem) {
     const activeClass = 'trip-tabs__btn--active';
     const prevActiveItem = this.getElement().querySelector(`.${activeClass}`);
@@ -37,5 +27,15 @@ export default class SiteMenu extends Abstract {
       prevActiveItem.classList.remove(activeClass);
       newActiveItem.classList.add(activeClass);
     }
+  }
+
+  setMenuClickHandler(callback) {
+    this._callback.menuClick = callback;
+    this.getElement().addEventListener('click', this._menuClickHandler);
+  }
+
+  _menuClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.menuClick(evt.target.dataset.menuItem);
   }
 }
