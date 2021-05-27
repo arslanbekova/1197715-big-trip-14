@@ -33,18 +33,6 @@ export default class Filter {
     remove(prevFilterComponent);
   }
 
-  _handleModelEvent() {
-    this.init();
-  }
-
-  _handleFilterTypeChange(filterType) {
-    if (this._filterModel.get() === filterType) {
-      return;
-    }
-
-    this._filterModel.set(UpdateType.MAJOR, filterType);
-  }
-
   setDisable() {
     this._filterComponent.getElement().querySelectorAll('.trip-filters__filter-input')
       .forEach((input) => input.setAttribute('disabled', 'disabled'));
@@ -75,5 +63,17 @@ export default class Filter {
         count: filter[FilterOption.PAST](routePoints).length,
       },
     ];
+  }
+
+  _handleModelEvent() {
+    this.init();
+  }
+
+  _handleFilterTypeChange(filterType) {
+    if (this._filterModel.get() === filterType) {
+      return;
+    }
+
+    this._filterModel.set(UpdateType.MAJOR, filterType);
   }
 }
