@@ -82,7 +82,7 @@ Promise.all([api.getOffers(), api.getDestinations()])
   .then((response) => {
     const [offers, destinations] = response;
     destinationsModel.set(destinations);
-    offersModel.setOffers(offers);
+    offersModel.set(offers);
     filterPresenter.init();
     tripPresenter.init();
   })

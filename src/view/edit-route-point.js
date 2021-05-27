@@ -85,7 +85,7 @@ const createEditRoutePointTemplate = (routePoint, destinationsModel, offersModel
     stateIsSaving,
     stateIsDeleting,
   } = routePoint;
-  const avaliableOffers = offersModel.getOffers()[type];
+  const avaliableOffers = offersModel.get()[type];
   const avaliableDestinations = destinationsModel.get();
   const offersTemplate = createOfferTemplate(type, stateIsOffers, offers, avaliableOffers, stateIsDisabled);
   const eventTypesTemplate = createEventTypeTemplate(ROUTE_POINT_TYPES, stateIsDisabled);
@@ -219,7 +219,7 @@ export default class EditRoutePoint extends Smart {
         return;
       }
 
-      const avaliableOffers = this._offersModel.getOffers()[newEventType];
+      const avaliableOffers = this._offersModel.get()[newEventType];
 
       this.updateState({
         type: newEventType,
@@ -381,7 +381,7 @@ export default class EditRoutePoint extends Smart {
 
   static parseDataToState(routePoint, offersModel) {
     const eventType = routePoint.type;
-    const avaliableOffers = offersModel.getOffers()[eventType];
+    const avaliableOffers = offersModel.get()[eventType];
     return Object.assign(
       {},
       routePoint,
