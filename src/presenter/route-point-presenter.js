@@ -2,6 +2,7 @@ import RoutePoint from '../view/route-point';
 import EditRoutePoint from '../view/edit-route-point';
 import {render, replace, remove} from '../utils/render';
 import {UserAction, UpdateType} from '../utils/const';
+import {isEscEvent} from '../utils/general';
 import dayjs from 'dayjs';
 
 const Mode = {
@@ -175,7 +176,7 @@ export default class RoutePointPresenter {
   }
 
   _escKeyDownHandler(evt) {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
+    if (isEscEvent(evt)) {
       evt.preventDefault();
       this._closeEditRoutePointForm();
     }
