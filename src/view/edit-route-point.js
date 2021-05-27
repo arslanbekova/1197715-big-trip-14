@@ -275,10 +275,11 @@ export default class EditRoutePoint extends Smart {
         stateIsSaveButtonDisabled: false,
       });
       return;
+    } else {
+      this.updateState({
+        stateIsSaveButtonDisabled: true,
+      });
     }
-    this.updateState({
-      stateIsSaveButtonDisabled: true,
-    });
   }
 
   _removeEqualOption(choosedOffer, choosedOffers) {
