@@ -123,13 +123,6 @@ export default class RoutePointPresenter {
     this._mode = Mode.DEFAULT;
   }
 
-  _escKeyDownHandler(evt) {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
-      this._closeEditRoutePointForm();
-    }
-  }
-
   _handleRoutePointArrowClick() {
     this._openEditRoutePointForm();
   }
@@ -179,5 +172,12 @@ export default class RoutePointPresenter {
         },
       ),
     );
+  }
+
+  _escKeyDownHandler(evt) {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      this._closeEditRoutePointForm();
+    }
   }
 }
