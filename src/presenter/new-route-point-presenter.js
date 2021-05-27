@@ -34,14 +34,6 @@ export default class NewRoutePointPresenter {
     document.addEventListener('keydown', this._escKeyDownHandler);
   }
 
-  setDisable() {
-    this._newEventButton.setAttribute('disabled', 'disabled');
-  }
-
-  setActive() {
-    this._newEventButton.removeAttribute('disabled');
-  }
-
   destroy() {
     if (this._newRoutePointComponent === null) {
       return;
@@ -52,6 +44,14 @@ export default class NewRoutePointPresenter {
 
     document.removeEventListener('keydown', this._escKeyDownHandler);
     this.setActive();
+  }
+
+  setDisable() {
+    this._newEventButton.setAttribute('disabled', 'disabled');
+  }
+
+  setActive() {
+    this._newEventButton.removeAttribute('disabled');
   }
 
   setSaving() {
