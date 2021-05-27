@@ -26,11 +26,7 @@ export const getSpendedTimeByType = (uniqTypes, routePoints) => uniqTypes.reduce
   routePoints.forEach((routePoint) => {
     if (routePoint.type === uniqType) {
       const durationTime = calculateDurationTime(routePoint.dateFrom, routePoint.dateTo);
-      if (spendedTime === null) {
-        spendedTime = durationTime;
-      } else {
-        spendedTime = spendedTime.add(durationTime);
-      }
+      spendedTime === null ? spendedTime = durationTime : spendedTime = spendedTime.add(durationTime);
       result[index] = {type: uniqType, spendedTime};
     }
     return;
