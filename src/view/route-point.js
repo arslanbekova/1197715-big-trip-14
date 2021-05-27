@@ -67,22 +67,22 @@ export default class RoutePoint extends Abstract {
     return createRoutePointTemplate(this._routePoint);
   }
 
-  _arrowClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.arrowClick();
-  }
-
   setArrowClickHandler(callback) {
     this._callback.arrowClick = callback;
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._arrowClickHandler);
   }
 
-  _favoriteClickHandler() {
-    this._callback.favoriteClick();
-  }
-
   setFavoriteClickHandler(callback) {
     this._callback.favoriteClick = callback;
     this.getElement().querySelector('.event__favorite-btn').addEventListener('click', this._favoriteClickHandler);
+  }
+
+  _arrowClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.arrowClick();
+  }
+
+  _favoriteClickHandler() {
+    this._callback.favoriteClick();
   }
 }
