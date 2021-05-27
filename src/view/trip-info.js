@@ -8,10 +8,9 @@ const getRoute = (routePoints) => {
     const firstCity = cities.shift();
     const secondCity = cities.pop();
     return `${firstCity} &mdash; ... &mdash; ${secondCity}`;
-  } else {
-    const [firstCity, secondCity, thirdCity] = cities;
-    return `${firstCity} &mdash; ${secondCity} &mdash; ${thirdCity}`;
   }
+  const [firstCity, secondCity, thirdCity] = cities;
+  return `${firstCity} &mdash; ${secondCity} &mdash; ${thirdCity}`;
 };
 
 const getDates = (routePoints) => {
@@ -34,7 +33,7 @@ export default class TripInfo extends Abstract {
   constructor(routePointsModel) {
     super();
     this._routePointsModel = routePointsModel;
-    this._routePoints = this._routePointsModel.getRoutePointsSortedByDefault().slice();
+    this._routePoints = this._routePointsModel.getSortedByDefault().slice();
   }
 
   getTemplate() {

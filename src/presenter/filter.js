@@ -21,7 +21,7 @@ export default class Filter {
   init() {
     const prevFilterComponent = this._filterComponent;
     const filters = this._getFilters();
-    this._filterComponent = new FilterOptions(filters, this._filterModel.getFilter());
+    this._filterComponent = new FilterOptions(filters, this._filterModel.get());
     this._filterComponent.setFilterTypeChangeHandler(this._handleFilterTypeChange);
 
     if (prevFilterComponent === null) {
@@ -31,18 +31,6 @@ export default class Filter {
 
     replace(this._filterComponent, prevFilterComponent);
     remove(prevFilterComponent);
-  }
-
-  _handleModelEvent() {
-    this.init();
-  }
-
-  _handleFilterTypeChange(filterType) {
-    if (this._filterModel.getFilter() === filterType) {
-      return;
-    }
-
-    this._filterModel.setFilter(UpdateType.MAJOR, filterType);
   }
 
   setDisable() {
@@ -56,7 +44,7 @@ export default class Filter {
   }
 
   _getFilters() {
-    const routePoints = this._routePointsModel.getRoutePoints();
+    const routePoints = this._routePointsModel.get();
 
     return [
       {
@@ -75,5 +63,17 @@ export default class Filter {
         count: filter[FilterOption.PAST](routePoints).length,
       },
     ];
+  }
+
+  _handleModelEvent() {
+    this.init();
+  }
+
+  _handleFilterTypeChange(filterType) {
+    if (this._filterModel.get() === filterType) {
+      return;
+    }
+
+    this._filterModel.set(UpdateType.MAJOR, filterType);
   }
 }

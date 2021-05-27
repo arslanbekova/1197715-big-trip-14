@@ -64,13 +64,13 @@ export default class Trip {
   createNewRoutePoint() {
     this._currentSortType = SortOption.DEFAULT.value;
     this._handleModeChange();
-    this._filterModel.setFilter(UpdateType.MAJOR, FilterOption.EVERYTHING);
+    this._filterModel.set(UpdateType.MAJOR, FilterOption.EVERYTHING);
     this._newRoutePointPresenter.init();
   }
 
   _getRoutePoints() {
-    const filterType = this._filterModel.getFilter();
-    const routePoints = this._routePointsModel.getRoutePoints();
+    const filterType = this._filterModel.get();
+    const routePoints = this._routePointsModel.get();
     const filtredRoutePoints = filter[filterType](routePoints);
     switch (this._currentSortType) {
       case SortOption.TO_SHORTEST_TIME.value:
@@ -134,7 +134,7 @@ export default class Trip {
         this._routePointPresenter[update.id].setViewState(RoutePointPresenterViewState.SAVING);
         this._api.updateRoutePoint(update)
           .then((response) => {
-            this._routePointsModel.updateRoutePoint(updateType, response);
+            this._routePointsModel.update(updateType, response);
           })
           .catch(() => {
             this._routePointPresenter[update.id].setViewState(RoutePointPresenterViewState.ABORTING);
@@ -144,7 +144,7 @@ export default class Trip {
         this._newRoutePointPresenter.setSaving();
         this._api.addRoutePoint(update)
           .then((response) => {
-            this._routePointsModel.addRoutePoint(updateType, response);
+            this._routePointsModel.add(updateType, response);
           })
           .catch(() => {
             this._newRoutePointPresenter.setAborting();
@@ -154,7 +154,7 @@ export default class Trip {
         this._routePointPresenter[update.id].setViewState(RoutePointPresenterViewState.DELETING);
         this._api.deleteRoutePoint(update)
           .then(() => {
-            this._routePointsModel.deleteRoutePoint(updateType, update);
+            this._routePointsModel.delete(updateType, update);
           })
           .catch(() => {
             this._routePointPresenter[update.id].setViewState(RoutePointPresenterViewState.ABORTING);

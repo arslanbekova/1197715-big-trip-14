@@ -2,6 +2,7 @@ import RoutePoint from '../view/route-point';
 import EditRoutePoint from '../view/edit-route-point';
 import {render, replace, remove} from '../utils/render';
 import {UserAction, UpdateType} from '../utils/const';
+import {isEscEvent} from '../utils/general';
 import dayjs from 'dayjs';
 
 const Mode = {
@@ -83,6 +84,7 @@ export default class RoutePointPresenter {
     const resetFormState = () => {
       this._editRoutePointComponent.updateState({
         stateIsDisabled: false,
+        stateIsSaveButtonDisabled: false,
         stateIsSaving: false,
         stateIsDeleting: false,
       });
@@ -91,12 +93,14 @@ export default class RoutePointPresenter {
       case State.SAVING:
         this._editRoutePointComponent.updateState({
           stateIsDisabled: true,
+          stateIsSaveButtonDisabled: true,
           stateIsSaving: true,
         });
         break;
       case State.DELETING:
         this._editRoutePointComponent.updateState({
           stateIsDisabled: true,
+          stateIsSaveButtonDisabled: true,
           stateIsDeleting: true,
         });
         break;
@@ -116,18 +120,11 @@ export default class RoutePointPresenter {
   }
 
   _closeEditRoutePointForm() {
-    this._editRoutePointComponent.removeDatepickers();
     this._editRoutePointComponent.resetState(this._routePoint);
+    this._editRoutePointComponent.removeDatepickers();
     replace(this._routePointComponent, this._editRoutePointComponent);
     document.removeEventListener('keydown', this._escKeyDownHandler);
     this._mode = Mode.DEFAULT;
-  }
-
-  _escKeyDownHandler(evt) {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
-      this._closeEditRoutePointForm();
-    }
   }
 
   _handleRoutePointArrowClick() {
@@ -179,5 +176,12 @@ export default class RoutePointPresenter {
         },
       ),
     );
+  }
+
+  _escKeyDownHandler(evt) {
+    if (isEscEvent(evt)) {
+      evt.preventDefault();
+      this._closeEditRoutePointForm();
+    }
   }
 }

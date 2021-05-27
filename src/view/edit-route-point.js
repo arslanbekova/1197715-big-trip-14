@@ -30,9 +30,8 @@ const createOfferTemplate = (eventType, isOffers, choosedOffers, avaliableOffers
       </div>`).join('')}
       </div>
     </section>`;
-  } else {
-    return '';
   }
+  return '';
 };
 
 const createEventTypeTemplate = (eventTypes, stateIsDisabled) => {
@@ -66,9 +65,8 @@ const createEventDescriptionTemplate = (destination, isDescriptioin) => {
         </div>
       </div>
     </section>`;
-  } else {
-    return '';
   }
+  return '';
 };
 
 const createEditRoutePointTemplate = (routePoint, destinationsModel, offersModel) => {
@@ -82,11 +80,12 @@ const createEditRoutePointTemplate = (routePoint, destinationsModel, offersModel
     stateIsDescription,
     stateIsOffers,
     stateIsDisabled,
+    stateIsSaveButtonDisabled,
     stateIsSaving,
     stateIsDeleting,
   } = routePoint;
-  const avaliableOffers = offersModel.getOffers()[type];
-  const avaliableDestinations = destinationsModel.getDestinations();
+  const avaliableOffers = offersModel.get()[type];
+  const avaliableDestinations = destinationsModel.get();
   const offersTemplate = createOfferTemplate(type, stateIsOffers, offers, avaliableOffers, stateIsDisabled);
   const eventTypesTemplate = createEventTypeTemplate(ROUTE_POINT_TYPES, stateIsDisabled);
   const eventDestinationsTemplate = createEventDestinationTemplate(avaliableDestinations);
@@ -114,7 +113,7 @@ const createEditRoutePointTemplate = (routePoint, destinationsModel, offersModel
           ${type}
         </label>
         <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination"
-          value="${he.encode(destination.name)}" list="destination-list-1" ${stateIsDisabled ? 'disabled' : ''}>
+          value="${he.encode(destination.name)}" list="destination-list-1" ${stateIsDisabled ? 'disabled' : ''} required>
         <datalist id="destination-list-1">
           ${eventDestinationsTemplate}
         </datalist>
@@ -123,11 +122,11 @@ const createEditRoutePointTemplate = (routePoint, destinationsModel, offersModel
       <div class="event__field-group  event__field-group--time">
         <label class="visually-hidden" for="event-start-time-1">From</label>
         <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time"
-          value="${dayjs(dateFrom).format('DD/MM/YY HH:mm')}" ${stateIsDisabled ? 'disabled' : ''}>
+          value="${dayjs(dateFrom).format('DD/MM/YY HH:mm')}" ${stateIsDisabled ? 'disabled' : ''} required>
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">To</label>
         <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time"
-          value="${dayjs(dateTo).format('DD/MM/YY HH:mm')}" ${stateIsDisabled ? 'disabled' : ''}>
+          value="${dayjs(dateTo).format('DD/MM/YY HH:mm')}" ${stateIsDisabled ? 'disabled' : ''} required>
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -135,12 +134,12 @@ const createEditRoutePointTemplate = (routePoint, destinationsModel, offersModel
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="number" min="0" name="event-price"
-          value="${basePrice}" ${stateIsDisabled ? 'disabled' : ''}>
+        <input class="event__input  event__input--price" id="event-price-1" type="number" min="1" name="event-price"
+          value="${basePrice}" ${stateIsDisabled ? 'disabled' : ''} required>
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit"
-        ${stateIsDisabled ? 'disabled' : ''}>${stateIsSaving ? 'Saving...' : 'Save'}</button>
+        ${stateIsSaveButtonDisabled ? 'disabled' : ''}>${stateIsSaving ? 'Saving...' : 'Save'}</button>
       <button class="event__reset-btn" type="reset"
         ${stateIsDisabled ? 'disabled' : ''}>${stateIsDeleting ? 'Deleting...' : 'Delete'}</button>
       <button class="event__rollup-btn" ${stateIsDisabled ? 'disabled' : ''} type="button">
@@ -169,7 +168,7 @@ export default class EditRoutePoint extends Smart {
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
     this._basePriceChangeHandler = this._basePriceChangeHandler.bind(this);
-    this._addExtraOption = this._addExtraOption.bind(this);
+    this._extraOptionChangeHandler = this._extraOptionChangeHandler.bind(this);
     this._dateFromChangeHandler = this._dateFromChangeHandler.bind(this);
     this._dateToChangeHandler = this._dateToChangeHandler.bind(this);
     this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
@@ -181,19 +180,25 @@ export default class EditRoutePoint extends Smart {
     return createEditRoutePointTemplate(this._state, this._destinationsModel, this._offersModel);
   }
 
-  _arrowClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.arrowClick();
+  resetState(routePoint) {
+    this.updateState(
+      EditRoutePoint.parseDataToState(routePoint, this._offersModel),
+    );
   }
 
-  setArrowClickHandler(callback) {
-    this._callback.arrowClick = callback;
-    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._arrowClickHandler);
+  setDatepickers() {
+    if (this._dateFromPicker || this._dateToPicker) {
+      this.removeDatepickers();
+    }
+    this._setDateFromPicker();
+    this._setDateToPicker();
   }
 
-  _formSubmitHandler(evt) {
-    evt.preventDefault();
-    this._callback.formSubmit(EditRoutePoint.parseStateToData(this._state));
+  removeDatepickers() {
+    this._dateFromPicker.destroy();
+    this._dateFromPicker = null;
+    this._dateToPicker.destroy();
+    this._dateToPicker = null;
   }
 
   setFormSubmitHandler(callback) {
@@ -201,111 +206,14 @@ export default class EditRoutePoint extends Smart {
     this.getElement().addEventListener('submit', this._formSubmitHandler);
   }
 
-  _formDeleteClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.deleteClick(EditRoutePoint.parseStateToData(this._state));
+  setArrowClickHandler(callback) {
+    this._callback.arrowClick = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._arrowClickHandler);
   }
 
   setDeleteClickHandler(callback) {
     this._callback.deleteClick = callback;
     this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteClickHandler);
-  }
-
-  _eventTypeChangeHandler(evt) {
-    if (evt.target.hasAttribute('data-event-type')) {
-      const newEventType = evt.target.dataset.eventType;
-
-      if (this._currentEventType === newEventType) {
-        return;
-      }
-
-      const avaliableOffers = this._offersModel.getOffers()[newEventType];
-
-      this.updateState({
-        type: newEventType,
-        offers: [],
-        stateIsOffers: Boolean(avaliableOffers.length),
-      });
-    }
-  }
-
-  _destinationChangeHandler(evt) {
-    const destinationNameElement = evt.target;
-    const destinationName = destinationNameElement.value;
-    const selectedOption = document.querySelector('option[value="' + destinationName + '"]');
-
-    if (selectedOption !== null) {
-      const newDestination = this._destinationsModel.getDestinations()[destinationName];
-      this.updateState({
-        destination: {
-          name: destinationName,
-          description: newDestination.description,
-          pictures: newDestination.pictures,
-        },
-        stateIsDescription: Boolean(newDestination.description.length),
-      });
-    } else {
-      this.updateState({
-        destination: {
-          name: '',
-          description: '',
-          pictures: [],
-        },
-        stateIsDescription: false,
-      });
-    }
-  }
-
-  _dateFromChangeHandler([userDate]) {
-    this.updateState({
-      dateFrom: userDate,
-    }, true);
-    this._dateToPicker.destroy();
-    this._dateToPicker = null;
-    this._setDateToPicker();
-  }
-
-  _dateToChangeHandler([userDate]) {
-    this.updateState({
-      dateTo: userDate,
-    }, true);
-  }
-
-  _basePriceChangeHandler(evt) {
-    const basePrice = Number(evt.target.value);
-    this.updateState({
-      basePrice,
-    }, true);
-  }
-
-  _removeEqualOption(choosedOffer, choosedOffers) {
-    const equalOffer = choosedOffers.find((element) => _.isEqual(element, choosedOffer));
-    removeArrayElement(equalOffer, choosedOffers);
-    this.updateState({
-      offers: choosedOffers,
-    }, true);
-  }
-
-  _addExtraOption(evt) {
-    const offerTitle = evt.target.dataset.offerTitle;
-    const offerPrice = evt.target.dataset.offerPrice;
-    const choosedOffer = {
-      title: offerTitle,
-      price: Number(offerPrice),
-    };
-    const choosedOffers = this._state.offers.slice();
-    const isEqualOffer = choosedOffers.some((element) => _.isEqual(element, choosedOffer));
-
-    if (isEqualOffer) {
-      this._removeEqualOption(choosedOffer, choosedOffers);
-      return;
-    }
-
-    choosedOffers.push(choosedOffer);
-
-    this.updateState({
-      offers: choosedOffers,
-    }, true);
   }
 
   restoreHandlers() {
@@ -316,11 +224,25 @@ export default class EditRoutePoint extends Smart {
     this.setDeleteClickHandler(this._callback.deleteClick);
   }
 
-  removeDatepickers() {
-    this._dateFromPicker.destroy();
-    this._dateFromPicker = null;
-    this._dateToPicker.destroy();
-    this._dateToPicker = null;
+  _setInnerHandlers() {
+    this.getElement()
+      .querySelector('.event__type-group')
+      .addEventListener('click', this._eventTypeChangeHandler);
+
+    ['change', 'paste'].forEach((evt) =>
+      this.getElement()
+        .querySelector('.event__input--destination').addEventListener(evt, this._destinationChangeHandler, false),
+    );
+
+    if (this._state.stateIsOffers) {
+      this.getElement()
+        .querySelectorAll('.event__offer-checkbox')
+        .forEach((element) => element.addEventListener('change', this._extraOptionChangeHandler));
+    }
+
+    this.getElement()
+      .querySelector('.event__input--price')
+      .addEventListener('change', this._basePriceChangeHandler);
   }
 
   _setDateToPicker() {
@@ -344,42 +266,142 @@ export default class EditRoutePoint extends Smart {
     });
   }
 
-  setDatepickers() {
-    this._setDateFromPicker();
+  _isFormValid() {
+    if (this._state.destination.name !== ''
+      && this._state.dateFrom
+        && this._state.dateTo
+          && this._state.basePrice) {
+      this.updateState({
+        stateIsSaveButtonDisabled: false,
+      });
+      return;
+    } else {
+      this.updateState({
+        stateIsSaveButtonDisabled: true,
+      });
+    }
+  }
+
+  _removeEqualOption(choosedOffer, choosedOffers) {
+    const equalOffer = choosedOffers.find((element) => _.isEqual(element, choosedOffer));
+    removeArrayElement(equalOffer, choosedOffers);
+    this.updateState({
+      offers: choosedOffers,
+    }, true);
+  }
+
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit(EditRoutePoint.parseStateToData(this._state));
+  }
+
+  _arrowClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.arrowClick();
+  }
+
+  _formDeleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(EditRoutePoint.parseStateToData(this._state));
+  }
+
+  _eventTypeChangeHandler(evt) {
+    if (evt.target.hasAttribute('data-event-type')) {
+      const newEventType = evt.target.dataset.eventType;
+
+      if (this._currentEventType === newEventType) {
+        return;
+      }
+
+      const avaliableOffers = this._offersModel.get()[newEventType];
+
+      this.updateState({
+        type: newEventType,
+        offers: [],
+        stateIsOffers: Boolean(avaliableOffers.length),
+      });
+      this._isFormValid();
+    }
+  }
+
+  _destinationChangeHandler(evt) {
+    const destinationNameElement = evt.target;
+    const destinationName = destinationNameElement.value;
+    const selectedOption = document.querySelector('option[value="' + destinationName + '"]');
+
+    if (selectedOption !== null) {
+      const newDestination = this._destinationsModel.get()[destinationName];
+      this.updateState({
+        destination: {
+          name: destinationName,
+          description: newDestination.description,
+          pictures: newDestination.pictures,
+        },
+        stateIsDescription: Boolean(newDestination.description.length),
+      });
+    } else {
+      this.updateState({
+        destination: {
+          name: '',
+          description: '',
+          pictures: [],
+        },
+        stateIsDescription: false,
+      });
+    }
+    this._isFormValid();
+  }
+
+  _dateFromChangeHandler([userDate]) {
+    this.updateState({
+      dateFrom: userDate,
+    }, true);
+    this._dateToPicker.destroy();
+    this._dateToPicker = null;
     this._setDateToPicker();
+    this._isFormValid();
   }
 
-  resetState(routePoint) {
-    this.updateState(
-      EditRoutePoint.parseDataToState(routePoint, this._offersModel),
-      true,
-    );
+  _dateToChangeHandler([userDate]) {
+    this.updateState({
+      dateTo: userDate,
+    }, true);
+    this._isFormValid();
   }
 
-  _setInnerHandlers() {
-    this.getElement()
-      .querySelector('.event__type-group')
-      .addEventListener('click', this._eventTypeChangeHandler);
+  _basePriceChangeHandler(evt) {
+    const basePrice = Number(evt.target.value);
+    this.updateState({
+      basePrice,
+    }, true);
+    this._isFormValid();
+  }
 
-    ['change', 'paste'].forEach((evt) =>
-      this.getElement()
-        .querySelector('.event__input--destination').addEventListener(evt, this._destinationChangeHandler, false),
-    );
+  _extraOptionChangeHandler(evt) {
+    const offerTitle = evt.target.dataset.offerTitle;
+    const offerPrice = evt.target.dataset.offerPrice;
+    const choosedOffer = {
+      title: offerTitle,
+      price: Number(offerPrice),
+    };
+    const choosedOffers = this._state.offers.slice();
+    const isEqualOffer = choosedOffers.some((element) => _.isEqual(element, choosedOffer));
 
-    if (this._state.stateIsOffers) {
-      this.getElement()
-        .querySelectorAll('.event__offer-checkbox')
-        .forEach((element) => element.addEventListener('change', this._addExtraOption));
+    if (isEqualOffer) {
+      this._removeEqualOption(choosedOffer, choosedOffers);
+      return;
     }
 
-    this.getElement()
-      .querySelector('.event__input--price')
-      .addEventListener('change', this._basePriceChangeHandler);
+    choosedOffers.push(choosedOffer);
+
+    this.updateState({
+      offers: choosedOffers,
+    }, true);
   }
 
   static parseDataToState(routePoint, offersModel) {
     const eventType = routePoint.type;
-    const avaliableOffers = offersModel.getOffers()[eventType];
+    const avaliableOffers = offersModel.get()[eventType];
     return Object.assign(
       {},
       routePoint,
@@ -387,6 +409,7 @@ export default class EditRoutePoint extends Smart {
         stateIsOffers: Boolean(avaliableOffers.length),
         stateIsDescription: Boolean(routePoint.destination.description.length),
         stateIsDisabled: false,
+        stateIsSaveButtonDisabled: false,
         stateIsSaving: false,
         stateIsDeleting: false,
       },
@@ -407,6 +430,7 @@ export default class EditRoutePoint extends Smart {
     delete state.stateIsOffers;
     delete state.stateIsDescription;
     delete state.stateIsDisabled;
+    delete state.stateIsSaveButtonDisabled;
     delete state.stateIsSaving;
     delete state.stateIsDeleting;
 

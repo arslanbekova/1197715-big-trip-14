@@ -1,6 +1,7 @@
 import NewRoutePoint from '../view/new-route-point';
-import {remove, render} from '../utils/render.js';
-import {UserAction, UpdateType, RenderPosition} from '../utils/const.js';
+import {remove, render} from '../utils/render';
+import {UserAction, UpdateType, RenderPosition} from '../utils/const';
+import {isEscEvent} from '../utils/general';
 
 export default class NewRoutePointPresenter {
   constructor(tripEventsList, changeData, destinationsModel, offersModel) {
@@ -34,14 +35,6 @@ export default class NewRoutePointPresenter {
     document.addEventListener('keydown', this._escKeyDownHandler);
   }
 
-  setDisable() {
-    this._newEventButton.setAttribute('disabled', 'disabled');
-  }
-
-  setActive() {
-    this._newEventButton.removeAttribute('disabled');
-  }
-
   destroy() {
     if (this._newRoutePointComponent === null) {
       return;
@@ -54,10 +47,19 @@ export default class NewRoutePointPresenter {
     this.setActive();
   }
 
+  setDisable() {
+    this._newEventButton.setAttribute('disabled', 'disabled');
+  }
+
+  setActive() {
+    this._newEventButton.removeAttribute('disabled');
+  }
+
   setSaving() {
     this._newRoutePointComponent.updateState({
       stateIsDisabled: true,
       stateIsSaving: true,
+      stateIsSaveButtonDisabled: true,
     });
   }
 
@@ -67,6 +69,7 @@ export default class NewRoutePointPresenter {
         stateIsDisabled: false,
         stateIsSaving: false,
         stateIsDeleting: false,
+        stateIsSaveButtonDisabled: false,
       });
     };
 
@@ -86,7 +89,7 @@ export default class NewRoutePointPresenter {
   }
 
   _escKeyDownHandler(evt) {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
+    if (isEscEvent(evt)) {
       evt.preventDefault();
       this.destroy();
     }

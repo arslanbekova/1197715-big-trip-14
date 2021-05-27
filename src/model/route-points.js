@@ -7,21 +7,21 @@ export default class RoutePoints extends Observer {
     this._routePoints = [];
   }
 
-  setRoutePoints(updateType, routePoints) {
+  set(updateType, routePoints) {
     this._routePoints = routePoints.slice();
     this._notify(updateType);
   }
 
-  getRoutePoints() {
+  get() {
     return this._routePoints;
   }
 
-  getRoutePointsSortedByDefault() {
+  getSortedByDefault() {
     const sourcedRoutePoints = this._routePoints.slice();
     return sourcedRoutePoints.sort((a, b) => dayjs(a.dateFrom).diff(dayjs(b.dateFrom)));
   }
 
-  updateRoutePoint(updateType, update) {
+  update(updateType, update) {
     const index = this._routePoints.findIndex((routePoint) => routePoint.id === update.id);
 
     if (index === -1) {
@@ -37,7 +37,7 @@ export default class RoutePoints extends Observer {
     this._notify(updateType, update);
   }
 
-  addRoutePoint(updateType, update) {
+  add(updateType, update) {
     this._routePoints = [
       update,
       ...this._routePoints,
@@ -46,7 +46,7 @@ export default class RoutePoints extends Observer {
     this._notify(updateType, update);
   }
 
-  deleteRoutePoint(updateType, update) {
+  delete(updateType, update) {
     const index = this._routePoints.findIndex((routePoint) => routePoint.id === update.id);
 
     if (index === -1) {

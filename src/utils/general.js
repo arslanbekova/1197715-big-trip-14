@@ -10,3 +10,7 @@ export const removeArrayElement = (element, array) => {
 };
 
 export const makeItemsUniq = (items) => [...new Set(items)];
+
+export const isEscEvent = (evt) => {
+  return evt.key === 'Escape' || evt.key === 'Esc';
+};
