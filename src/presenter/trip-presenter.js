@@ -64,12 +64,12 @@ export default class Trip {
   createNewRoutePoint() {
     this._currentSortType = SortOption.DEFAULT.value;
     this._handleModeChange();
-    this._filterModel.setFilter(UpdateType.MAJOR, FilterOption.EVERYTHING);
+    this._filterModel.set(UpdateType.MAJOR, FilterOption.EVERYTHING);
     this._newRoutePointPresenter.init();
   }
 
   _getRoutePoints() {
-    const filterType = this._filterModel.getFilter();
+    const filterType = this._filterModel.get();
     const routePoints = this._routePointsModel.getRoutePoints();
     const filtredRoutePoints = filter[filterType](routePoints);
     switch (this._currentSortType) {
